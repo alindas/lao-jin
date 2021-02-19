@@ -1,0 +1,42 @@
+{
+  "sort": "我的草稿",
+  "count": 3,
+  "content": {
+    "a": {
+      "key": "a",
+      "title": "卖猪仔咯",
+      "recruitNumber": 2,
+      "effectiveTime": ["Tue Dec 01 2020 00:00:00 GMT+0800", "Wed Dec 02 2020 00:00:00 GMT+0800"],
+      "sort": ["校内兼职"],
+      "tags": ["苦力活", "要吃药"],
+      "content": "一块两块，两块一块",
+      "release": false,
+      "releaseTime": 1608118248113,
+      "releaseDate": "2020-12-16 19:40:01"
+    },
+    "b": {
+      "key": "b",
+      "title": "卖羊杂咯",
+      "recruitNumber": 3,
+      "effectiveTime": ["Thu Dec 03 2020 00:00:00 GMT+0800", "Fri Dec 04 2020 00:00:00 GMT+0800"],
+      "sort": [],
+      "tags": [],
+      "content": "一块两块，两块一块",
+      "release": false,
+      "releaseTime": 1608118312786,
+      "releaseDate": "2020-12-16 19:50:02"
+    },
+    "c": {
+      "key": "c",
+      "title": "卖牛嗨咯",
+      "recruitNumber": 3,
+      "effectiveTime": ["Tue Dec 01 2020 00:00:00 GMT+0800", "Wed Dec 02 2020 00:00:00 GMT+0800"],
+      "sort": [],
+      "tags": [],
+      "content": "一块两块，两块一块",
+      "release": false,
+      "releaseTime": 1608118329439,
+      "releaseDate": "2020-12-16 19:55:03"
+    }
+  }
+}

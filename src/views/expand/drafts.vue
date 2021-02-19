@@ -1,0 +1,139 @@
+<template>
+  <div class="content">
+    <header>
+      <div class="container clear">
+        <div class="pic">
+          <a href="/">
+            <img src="~@/assets/logo.png" alt="logo">
+          </a>
+        </div>
+        <i class="flag"></i>
+        <div class="pagetitle">
+          <span>草稿箱</span>
+        </div>
+        <div class="menu">
+          <div class="action">
+            <el-button type="primary" plain @click="JumpPage('/others/release')">
+              <i class="el-icon-edit-outline"></i>&nbsp;发布兼职
+            </el-button>
+          </div>
+          <div class="more">
+            <el-dropdown trigger="click" placement="top">
+              <span class="el-dropdown-link" title="更多">
+                <i class="el-icon-more "></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item>
+                  <router-link :to="draftsPath">
+                    我的发布
+                  </router-link>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="clear">
+      <div class="container">
+        <div class="drafts">
+          <div class="item" v-for="item in draftsList" :key="item.key">
+            <router-link :to="'/others/release?id=' + item.key" class="title">{{item.title}}</router-link>  
+            <div class="meta">
+              <el-tooltip effect="dark" :content="item.releaseDate" placement="bottom">
+                <div class="time">{{writeTime(item.releaseTime)}}</div>
+              </el-tooltip>
+              <div class="separator">·</div>
+              <button class="action" @click="deleteDrafts(item.key)">删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+import { getCenterMessage, deleteCenterMessage } from '@/axios/request';
+import showTime from '@/assets/utils/showTime';
+
+
+export default {
+  name: 'drafts',
+  computed: {
+    draftsPath() {
+      return '/personal/' + this.$store.state.account._id + '/release';
+    }
+  },
+  data() {
+    return {
+      draftsList: {}, // 用户草稿内容
+    }
+  },
+  methods: {
+    // 草稿删除
+    deleteDrafts(key) {
+      this.$confirm('是否删除该草稿?', '删除草稿', {
+        confirmButtonText: '确定',
+        confirmButtonClass: 'confirmButton',
+        cancelButtonText: '取消',
+        cancelButtonClass: 'cancelButton',
+        center: true,
+        showClose: false,
+        closeOnClickModal: false,
+        customClass: 'draftsRemoveDialog'
+      })
+      .then(() => {
+        deleteCenterMessage({
+          key: this.$store.state.account.drafts,
+          deleteKey: key,
+          type: "drafts" })
+        .then(res => {
+          if(res.data.message == 'success') {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+          }
+          else {
+            this.$message.error('删除失败，请稍后重试');
+          }
+        })
+        .catch(err => {
+          this.$message.error('服务器错误，请稍后重试');
+        })
+      })
+      .catch(() => {
+        console.log('已取消删除');
+      })
+    },
+    // 获取草稿发布时间差
+    writeTime(time) {
+      return showTime(time);
+      
+    },
+    // 导航栏菜单跳转
+    JumpPage(url) {
+      this.$router.push(url);
+    },
+    load() {
+      getCenterMessage({type: 'drafts', key: this.$store.state.account.drafts})
+        .then(res => {
+          this.draftsList = res.data[0];
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    }
+  },
+  created() {
+    this.load();
+  }
+}
+
+</script>
+<style lang="scss" scoped>
+@import '@/style/commonValue';
+@import '@/style/othersMain';
+
+</style>

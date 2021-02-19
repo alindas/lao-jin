@@ -1,0 +1,200 @@
+<template>
+  <div class="main-container">
+    <div class="tag-info-box">
+      <div class="tag-info">
+        <div class="title">{{tagName}}</div>
+        <div class="tag-meta">{{tagMeta}}</div>
+      </div>
+    </div>
+    <section class="clear">
+      <div class="container">
+        <div class="main">
+          <nav class="nav">
+            <div class="left">
+              <img src="~@/assets/ttt.jpg" alt="" class="tag-icon">
+              <el-button type="success" size="small" plain>关注</el-button>
+            </div>
+						<el-menu default-active="hotest" router mode="horizontal" active-text-color="#fAAf00">
+							<el-menu-item index="hotest" >热门</el-menu-item>
+							<el-menu-item index="latest" >最新</el-menu-item>
+							<el-menu-item index="well" >收益</el-menu-item>
+						</el-menu>
+					</nav>
+          <transition-group>
+            <div class="list" v-for="(list,index) in lists" :key="list._id">
+              <div>
+                <ul class="meta-list">
+                  <li>{{list.author}}</li>
+                  <li>{{releaseData(list.data.releaseTime)}}</li>
+                  <li>
+                    <router-link v-for="(item,index) in list.data.tags" :key="index"
+                    :to="'/fun?tag=' + item" target="_blank" class="tags">{{item}}</router-link>
+                  </li>
+                </ul>
+                <h2>
+                    <router-link :to="'/post/' + list._id " target="_blank">{{list.data.title}}</router-link>
+                </h2>
+                <div class="content">
+                  <div class="actions">
+                    <span @click="love(index)">
+                      <button :class="{agree: isVoteUp(list._id)}"><i class="lj-icon-dianzanqian"></i> {{list.voteup_count}}</button>
+                    </span>
+                    <span>
+                      <a href="/post#comment" target="_blank"><i class="el-icon-s-comment">&nbsp;{{list.comment_count}} 条评论</i></a> 
+                    </span>
+                    <span>
+                      <i class="el-icon-share">&nbsp;分享</i>
+                    </span>
+                    <span>
+                      <el-popover placement="bottom" width="80">
+                        <button class="more">&nbsp;收藏</button>
+                        <button class="more">&nbsp;举报</button>
+                        <i class="el-icon-more" slot="reference"></i>
+                      </el-popover>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </transition-group>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+import { getTagMain, updatePartTimeWork } from '@/axios/request';
+import showTime from '@/assets/utils/showTime';
+
+
+export default {
+  name: 'findContent',
+  computed: {
+    tagName() {
+      return this.$route.params.tag;
+    },
+    tagMeta() {
+      return '366895 关注，48562 文章';
+    }
+  },
+  data() {
+    return {
+			lists: []
+    }
+  },
+  methods: {
+    // 返回发布时间
+		releaseData(date) {
+			return showTime(date);
+		},
+		// 已点赞文章返回高亮
+    isVoteUp(key) {
+      for(let i of this.$store.state.voteUpList) {
+        if(i == key) return true;
+      }
+      return false;
+    },
+		load () {
+			getTagMain({tag: this.$route.params.tag})
+			.then(res => {
+				this.lists = res.data;
+			})
+			.catch(err => {
+				console.log(err);
+			})
+		},
+		love(id) {
+			if(!localStorage.getItem('account')) {
+				this.$store.commit('showLoginedDialog');
+				return;
+			}
+			else {
+				let params = {
+          articleKey: this.lists[id]._id,
+          account: this.$store.state.account._id,
+          type: 'voteUp',
+          action: this.isVoteUp(this.lists[id]._id) ? 'cancel' : 'set'
+        };
+        updatePartTimeWork(params)
+        .then(res => {
+          if(res.data.message == 'success') {
+            this.lists[id].voteup_count = res.data.newVoteUpCount;
+            this.$store.commit('initVoteUpList', res.data.newLikeHis);
+          }
+          else {
+            this.$message.error('请求失败，请稍后重试');
+          }
+        })
+        .catch(err => {
+          this.$message.error(err);
+        })
+			}
+
+		}
+  },
+  created() {
+		this.load();
+  }
+}
+
+</script>
+<style lang="scss" scoped>
+@import '@/style/commonValue';
+@import '@/style/indexMain';
+
+@include animate();
+
+.main-container {
+  padding-top: 65px;
+}
+
+.tag-info-box {
+  position: relative;
+  height: 150px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #f1f1f1;
+  .tag-info {
+    width: 100%;
+    height: 100%;
+    padding: 48px 0;
+    text-align: center;
+    box-sizing: border-box;
+    color: #666;
+    .title {
+      font-size: 25px;
+      line-height: 30px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  height: 50px;
+  border-bottom: 1px solid hsla(0,0%,59.2%,.1);
+  .left {
+    display: flex;
+    width: 120px;
+    justify-content: space-between;
+    align-items: center;
+    img {
+      width: auto;
+    }
+    .tag-icon {
+      height: 30px;
+    }
+  }
+  .el-menu.el-menu--horizontal {
+		border-bottom: none;
+		.el-menu-item {
+			border-bottom: none ;
+      padding: 0 20px ;
+      height: 50px;
+      background-color: #f6f6f6;
+		}
+	}
+}
+</style>

@@ -1,0 +1,159 @@
+section {
+  padding-top: 110px;
+}
+
+.subnav {
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(18, 18, 18, .1);
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+  height: 45px;
+  top: 65px;
+  .el-menu.el-menu--horizontal {
+    display: inline-block;
+    height: 45px;
+    box-sizing: border-box;
+    border-bottom: none;
+    >.el-menu-item {
+      height: 100%;
+      line-height: 45px;
+      font-weight: 400;
+      border-bottom: none;
+      padding: 0 20px;
+      &:hover {
+        color: $selected-color;
+      }
+    }
+  }
+}
+
+.setting-view {
+  width: 100%;
+  position: relative;
+  padding: 32px 48px 84px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .05);
+  h1 {
+    font-size: 24px;
+    margin: 16px 0;
+  }
+  .settings-list {
+    .item {
+      padding: 24px 0;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid #f1f1f1;
+      &:last-child {
+        border-bottom: 1px solid #f1f1f1;
+      }
+      .title {
+        font-size: 15px;
+        color: #333;
+        width: 120px;
+      }
+      .input-box {
+        display: flex;
+        flex: 1;
+        float: left;
+        .avatar {
+          width: 72px;
+          height: 72px;
+          margin-right: 12px;
+        }
+        .input {
+          flex: 1;
+          display: inline-block;
+          border: none;
+          outline: none;
+          color: #909090;
+          font-size: 16px;
+          overflow: visible;
+        }
+        input::-webkit-input-placeholder {
+          color: #c9c9c9;
+        }
+        input::-moz-placeholder {
+          color: #c9c9c9;
+        }
+        input::-ms-input-placeholder {
+          color: #c9c9c9;
+        }
+        .content-box {
+          color: #909090;
+        }
+      }
+      .action-box {
+        float: left;
+        margin-left: 12px;
+        font-size: 15px;
+        color: $selected-color;
+        .el-button--small {
+          padding: 9px 15px !important;
+        }
+        .el-button--text {
+          float: right;
+          +.el-button--text {
+            color: #666;
+          }
+        }
+      }
+    }
+  }
+  &.profile {
+    .item {
+      &:first-child {
+        padding: 12px 0;
+        height: 72px;
+      }
+    }
+  }
+}
+
+.el-dialog__wrapper,
+.v-modal {
+  height: 100vh !important;
+}
+
+.el-dialog__body {
+  padding: 10px 20px !important;
+  ul {
+    padding-bottom: 5px;
+    font-size: 13px;
+    height: 20px;
+    li {
+      float: left;
+      +li {
+        float: right;
+      }
+      span {
+        padding-right: 5px;
+        cursor: pointer;
+        color: $selected-color;
+      }
+    }
+  }
+}
+
+.el-form {
+  .el-form-item {
+    margin-bottom: 10px !important;
+    .el-input--suffix {
+      span {
+        padding-right: 3px;
+        cursor: pointer;
+        color: $selected-color;
+      }
+      .verifyBan {
+        cursor: auto;
+        color: #8590a6;
+      }
+    }
+  }
+  .el-button--small {
+    width: 100%;
+    padding: 9px 15px !important;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "e2bb0d786783e9b3972ddc978f39ee5b": {
+    "key": "e2bb0d786783e9b3972ddc978f39ee5b",
+    "sessionName": "林志玲",
+    "latestTime": "12-15",
+    "latestContent": "亲爱的，你慢慢飞",
+    "content": {
+      "2020-12-15 18:44:01": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:02": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:03": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:04": { "send": "滚", "timeLine": 0 }
+    }
+
+  },
+  "c2bb0d786334635655656c978f39ee5b": {
+    "key": "c2bb0d786334635655656c978f39ee5b",
+    "sessionName": "刘亦菲",
+    "latestTime": "12-15",
+    "latestContent": "亲爱的，我想你了",
+    "content": {
+      "2020-12-15 18:44:01": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:02": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:03": { "receiver": "我喜欢你，你赶紧回复我好吧", "timeLine": 0 },
+      "2020-12-15 18:44:04": { "send": "滚", "timeLine": 0 }
+    }
+  }
+}

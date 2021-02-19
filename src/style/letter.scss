@@ -1,0 +1,163 @@
+section {
+  padding-top: 65px;
+}
+
+.main {
+  margin: 10px 10px 0 0;
+  width: 100%;
+  display: inline-block;
+}
+
+.chat {
+  border-radius: 3px;
+  display: flex;
+  box-shadow: 0 0 4px 0 rgba(18, 18, 18, .1);
+  border: 1px solid #ebebeb;
+  min-height: 614px;
+  height: calc(100vh - 200px);
+  max-height: 1000px;
+  background-color: #fff;
+}
+
+.chatSideBar {
+  position: relative;
+  width: 286px;
+  height: 100%;
+  border-right: 1px solid #ebebeb;
+}
+
+.chatSearch {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 286px;
+  height: 76px;
+  max-height: 100%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  .el-input {
+    width: 246px;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.searchGroup {
+  min-height: 110px;
+}
+
+.chatListGroup {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  top: 56px;
+  width: 100%;
+  transition: transform 300ms ease 0s;
+  .title {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    position: relative;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 16px;
+    color: #444;
+    span {
+      flex: 1;
+    }
+  }
+  .content {
+    overflow-y: scroll;
+    position: relative;
+    .list-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px 12px 29px;
+      cursor: pointer;
+      position: relative;
+      .avatar {
+        box-sizing: border-box;
+        margin-right: 10px;
+        min-width: 0;
+        flex-shrink: 0;
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        img {
+          width: 100%;
+        }
+      }
+      .list-item-content {
+        flex: auto;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        .user-name {
+          display: flex;
+          align-items: center;
+          .name {
+            flex: 1;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: 15px;
+            font-weight: 500;
+          }
+          .time {
+            font-size: 10px;
+            color: #999;
+          }
+        }
+        .snippet {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          font-size: 13px;
+          color: #999;
+        }
+      }
+      .action {
+        position: absolute;
+        opacity: 0;
+        right: 0;
+        height: 40px;
+        width: 40px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #999;
+        text-align: center;
+        line-height: 40px;
+        background: linear-gradient(90deg, hsla(0, 0%, 100%, 0), #fff 20%);
+        transition: opacity .3s;
+      }
+      &:hover {
+        .action {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.more {
+  @include button;
+  display: block;
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  color: #909399;
+  background-color: #fff;
+  &:hover {
+    background-color: #f6f6f6
+  }
+}
