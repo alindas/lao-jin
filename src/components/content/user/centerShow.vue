@@ -7,11 +7,12 @@
       </h4>
     </div>
 		<transition-group>
-			<div class="list" v-for="list in showList" :key="list.key">
-				<div>
+			<div class="list" v-for="list in showList" :key="list.key ? list.key : list.account">
+				<div v-if="listContentType == 0">
 					<h2>
             <router-link to="/post" v-if="status == 'release'" target="_blank">{{list.title}}</router-link>
-            <router-link :to="'/others/release?id=' + list.key" v-if="status == 'drafts'" target="_blank">{{list.title}}</router-link>
+            <router-link :to="'/others/release?id=' + list.key" 
+             v-if="status == 'drafts'" target="_blank">{{list.title}}</router-link>
 					</h2>
 					<div class="content">
 						<div class="actions" v-if="status == 'release'">
@@ -38,6 +39,18 @@
 						</div>
 					</div>
 				</div>
+        <div v-if="listContentType == 1" class="tagsAndUsers">
+          <router-link :to="'/users/' + list._id" target="_blank" class="avatar-link">
+						<img :src="Avatar(list.avatar)" alt="">
+					</router-link>
+					<div class="meta">
+						<h4><router-link :to="'/users/' + list._id " target="_blank">{{list.name}}</router-link></h4>
+						<span>{{list.introduction}}</span>
+					</div>
+					<el-button type="primary" size="small" :plain="!resetFollow[list._id]"
+						@click="followUser(list._id, list.name, list.avatar)" v-if="status = 'follows'"
+					>{{resetFollow[list._id] ? '关注' : '取消关注'}}</el-button>
+        </div>
 			</div>
       <div class="nothing" key="nothing" v-if="!count">
         <span>还没有内容</span>
@@ -47,7 +60,7 @@
 </template>
 
 <script>
-import { getCenterMessage, deleteCenterMessage} from '@/axios/request';
+import { getCenterMessage, deleteCenterMessage, followAuthor} from '@/axios/request';
 
 export default {
   name: 'centerShow',
@@ -58,6 +71,7 @@ export default {
       diaftsList: {}, // 储存展示的草稿内容
       showList: {}, // 储存展示的内容
       showListTitle: '', // 展示子标题
+      resetFollow: [] // 取消关注列表
     }
   },
   watch: {
@@ -68,9 +82,47 @@ export default {
   computed: {
     count() {
       return Object.keys(this.showList).length;
+    },
+    listContentType() {
+      if(this.status == 'activities' || this.status == 'release' || this.status == 'drafts') {
+        return 0;
+      }else if(this.status == 'follows' || this.status == 'fans') {
+        return 1;
+      }else {
+        return -1;
+      }
     }
   },
   methods: {
+    Avatar(data) {
+      if(data) {
+        return 'data:' + data.mimetype + ';base64,' + data.base64;
+      }
+      else {
+        return 'data:' + this.$store.state.account.avatar.mimetype + ';base64,' + this.$store.state.account.avatar.base64;
+      }
+    },
+    // 关注用户
+    followUser(id, name, avatar) {
+      let params = {
+        account: id,
+				name: name,
+				avatar: avatar,
+      };
+			let type = this.resetFollow[id] ? '' : 'cancel';
+      followAuthor({key: this.$store.state.account.follow, follow: params, type: type})
+      .then(res => {
+				console.log(res);
+				if(res.data.message == 'success') {
+					let option = this.resetFollow[id] ? false : true;
+					this.$store.commit('updateFollowList', [id, !option]);
+					this.$set(this.resetFollow, id, option);
+				}
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
     // 草稿删除
     deleteDrafts(key) {
       this.$confirm('是否删除该草稿?', '删除草稿', {
@@ -109,42 +161,45 @@ export default {
     },
     load() {
       this.status = this.$route.path.split('/')[3] ? this.$route.path.split('/')[3] : '';
+      let params = {};
       if(this.status == 'release') {
         this.showListTitle = '我的发布';
-        /**
-         * 请求用户发布的所有兼职信息
-         */
-        getCenterMessage({type: 'release', key: this.$store.state.account.release})
-        .then(res => {
-          this.showList = res.data[0];
-        })
-        .catch(err => {
-          console.log(err);
-        })
+        params.type = 'release';
+        params.key = this.$store.state.account.release;
       }
       else if(this.status == 'drafts') {
         this.showListTitle = '我的草稿';
-        /**
-         * 请求用户的所有草稿信息
-         */
-        getCenterMessage({type: 'drafts', key: this.$store.state.account.drafts})
-        .then(res => {
-          this.showList = res.data[0];
-        })
-        .catch(err => {
-          console.log(err);
-        })
+        params.type = 'drafts';
+        params.key = this.$store.state.account.drafts;
+      }
+      else if(this.status == 'follows') {
+        this.showListTitle = '我的关注';
+        params.type = 'follows';
+        params.key = this.$store.state.account.follow;
+      }
+      else if(this.status == 'fans') {
+        this.showListTitle = '我的粉丝';
+        params.type = 'fans';
+        params.key = this.$store.state.account.fans;
+      }
+      else if(this.status == 'activities') {
+        this.showListTitle = '我的动态';
+        params.type = 'drafts';
+        params.key = this.$store.state.account.drafts;
       }
       else {
         this.showListTitle = '我的';
-        getCenterMessage({type: 'drafts', key: this.$store.state.account.drafts})
-        .then(res => {
-          this.showList = res.data[0];
-        })
-        .catch(err => {
-          console.log(err);
-        })
       }
+      /**
+       * 请求用户的所有动态列表
+       */
+      getCenterMessage(params)
+      .then(res => {
+        this.showList = res.data[0];
+      })
+      .catch(err => {
+        console.log(err);
+      })
     }
   },
   created() {

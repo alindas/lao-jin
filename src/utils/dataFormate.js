@@ -1,6 +1,12 @@
+/**
+ * 
+ * @param {*} fmt string 参数，表示输出的日期格式，如Y-M-d ,输出2021-4-9
+ * @returns 
+ */
 export default function getFormateDate(fmt) {
   let date = new Date();
   let o = {
+    "Y+": date.getFullYear(), // 年份
     "M+": date.getMonth() + 1, //月份 
     "d+": date.getDate(), //日 
     "h+": date.getHours(), //小时 

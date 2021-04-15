@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Game from '@/assets/utils/special'
+import Game from '@/utils/special'
 export default {
   name: 'Special',
   mounted() {

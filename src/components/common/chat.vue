@@ -11,7 +11,7 @@
             <div class="message-w reserve" v-if="contentBody[item].name == loginedAcc">
               <div class="avatar"><a href="#"><img :src="avatarSelf" alt=""></a></div>
               <div class="message-content reserve">
-                <div class="message-text receiver">{{contentBody[item].text}}</div>
+                <div class="message-text sender">{{contentBody[item].text}}</div>
                 <el-popover placement="bottom" width="80" class="message-status">
                   <button class="more" @click="removeMessage(item)">&nbsp;删除</button>
                   <i class="el-icon-more" slot="reference"></i>
@@ -21,7 +21,7 @@
             <div class="message-w" v-else>
               <div class="avatar"><a href="#"><img :src="avatarB" alt=""></a></div>
               <div class="message-content">
-                <div class="message-text sender">{{contentBody[item].text}}</div>
+                <div class="message-text receiver">{{contentBody[item].text}}</div>
                 <el-popover placement="bottom" width="80" class="message-status">
                   <button class="more" @click="removeMessage(item)">&nbsp;删除</button>
                   <button class="more">&nbsp;举报</button>
@@ -57,8 +57,8 @@
 </template>
 
 <script>
-import getFormateDate from '@/assets/utils/dataFormate';
-import { getCursorPosition, setCursorPosition } from '@/assets/utils/handleCursorPosition';
+import getFormateDate from '@/utils/dataFormate';
+import { getCursorPosition, setCursorPosition } from '@/utils/handleCursorPosition';
 import { getChatMessageContent } from '@/axios/request';
 
 export default {
@@ -71,7 +71,7 @@ export default {
       required: true
     },
     sendStatus: {
-      default: 0,
+      default: null,
       required: true
     }
   },
@@ -91,6 +91,7 @@ export default {
     return {
       contentBody: {},
       inputMessage: '',
+      sendContentBody: null
     }
   },
   watch: {
@@ -98,9 +99,18 @@ export default {
       this.requestData(newValue)
     },
     sendStatus() {
-      // console.log(this);
-      this.requestData(this.currentMessageKey)
-    }
+      this.contentBody[this.sendStatus.key] = this.sendStatus.content;
+      this.$forceUpdate();
+    },
+    '$store.state.notice.chat': function(newVal) {
+      // for(let item of newVal) {
+      //   this.contentBody[item.key] = item.content;
+      //   console.log(this.contentBody[item.key]);
+      // }
+      console.log(newVal);
+      this.contentBody[newVal.key] = newVal.content;
+      this.$forceUpdate();
+    },
   },
   methods: {
     requestData(key) {
@@ -165,9 +175,9 @@ export default {
         customClass: 'chatRemoveDialog'
       })
       .then(() => {
-        this.$emit('DeleteMess',key);
-        this.$forceUpdate();
-
+        delete this.contentBody[key];
+          // this.$emit('DeleteMess',this.contentBody[cl[cl.length - 2]]);
+        this.$forceUpdate(); // 强制刷新this.contentBody
       })
       .catch(() => {
         return;

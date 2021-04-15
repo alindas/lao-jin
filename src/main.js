@@ -8,12 +8,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './style/elementVariables.scss'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-
+import Icon from 'vue-svg-icon/Icon.vue'
+import './router/permission'
 // 解决EleUI Dialog 对话框默认锁定滚动条对页面产生抖动问题
 // ElementUI.Dialog.props.lockScroll.defalut = false;
 Vue.config.productionTip = true;
 Vue.use(ElementUI);
-
+// 全局使用Icon 组件
+Vue.component('icon', Icon);
 // 配置路由导航前置守卫
 router.beforeEach((to, from, next) => {
   NProgress.start();

@@ -47,7 +47,7 @@
     </header>
     <section class="clear">
       <div class="container">
-        <el-form ref="form" :model="releaseForm" label-width="80px" :rules="releaseFormRules">
+        <el-form ref="releaseForm" :model="releaseForm" label-width="80px" :rules="releaseFormRules">
           <el-form-item label="信息标题" prop="title">
             <el-input v-model="releaseForm.title"></el-input>
           </el-form-item>
@@ -109,6 +109,7 @@
 
 <script>
 import { getCenterMessage, updateDrafts, updateRelease } from '@/axios/request';
+import getFormateDate from '@/utils/dataFormate.js';
 
 export default {
   name: 'Release',
@@ -151,7 +152,7 @@ export default {
       }, 500)
     };
     return {
-      toolTip: '编辑中', // 操作提示信息
+      toolTip: '', // 操作提示信息
       // 日期选择快捷内容
       pickerOptions: {
           shortcuts: [{
@@ -213,38 +214,55 @@ export default {
     }
   },
   watch: {
+    releaseForm: {
+      handler: function(newValue, oldValue) {
+        if(oldValue.key != '') {
+          this.toolTip = '已编辑';
+        }
+      },
+      deep: true
+    }
   },
   methods: {
     // 发布内容
     saveRelease() {
-      let upsetData = {
-        releaseKey: this.$store.state.account.release,
-        draftsKey: this.$store.state.account.drafts,
-        type: this.$route.query.id ? 'fromDrafts' : '',
-        data: this.releaseForm,
-      }
-      updateRelease(upsetData)
-      .then(res => {
-        if(res.data.message == 'success') {
-          window.location.href = '/post';
-        }
-        else {
-          this.$message.error('服务器错误，稍后重试');
+      this.$refs['releaseForm'].validate(valid => {
+        if(valid) {
+          this.releaseForm['releaseDate'] = getFormateDate('Y-M-d h:m:s');
+          this.releaseForm['releaseTime'] = new Date().getTime();
+          this.releaseForm['release'] = true;
+          let upsetData = {
+            type: this.$route.query.id ? 'fromDrafts' : '',
+            data: this.releaseForm,
+          };
+          let { _id, avatar, name, release, drafts} = JSON.parse(localStorage.getItem('baseMess'));
+          updateRelease({...upsetData, _id, avatar, name, release, drafts})
+          .then(res => {
+            if(res.data.message == 'success') {
+              window.location.href = `/post/${res.data.url}`;
+            }
+            else {
+              this.$message.error('服务器错误，稍后重试');
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          })
+        }else {
+          return false;
         }
       })
-      .catch(err => {
-        console.log(err);
-      })
+      
     },
     // 保存为草稿
     saveDrafts() {
       let upsetData = {
-        key: this.$store.state.account.drafts,
+        key: localStorage.getItem('drafts'),
         data: this.releaseForm,
       }
       updateDrafts(upsetData)
       .then(res => {
-        console.log(res);
+        this.toolTip = '已保存';
       })
       .catch(err => {
         console.log(err);
@@ -252,7 +270,7 @@ export default {
     },
     // 以下三项用于动态添加tag 标签
     handleClose(tag) {
-      this.releaseForm.dynamicTags.splice(this.releaseForm.dynamicTags.indexOf(tag), 1);
+      this.releaseForm.tags.splice(this.releaseForm.tags.indexOf(tag), 1);
     },
     showInput() {
       this.inputVisible = true;
@@ -263,7 +281,7 @@ export default {
     handleInputConfirm() {
       let dynamicTag = this.dynamicTag;
       if (dynamicTag) {
-        this.releaseForm.dynamicTags.push(dynamicTag);
+        this.releaseForm.tags.push(dynamicTag);
       }
       this.inputVisible = false;
       this.dynamicTag = '';
@@ -273,11 +291,18 @@ export default {
       if(this.$route.query.id) {
         getCenterMessage({
           type: 'drafts', 
-          key: this.$store.state.account.drafts,
+          key: localStorage.getItem('drafts'),
           single: 1,
           singleKey: this.$route.query.id })
         .then(res => {
-          this.releaseForm = res.data[0][this.$route.query.id];
+          let init = res.data[0][this.$route.query.id];
+          for (let i in init.sort) {
+            init.sort[i] = init.sort[i].name;
+          }
+          for (let j in init.tags) {
+            init.tags[j] = init.tags[j].name;
+          }
+          this.releaseForm = init;
         })
         .catch(err => {
           console.log(err);
@@ -291,7 +316,7 @@ export default {
     },
     // 返回我的主页并显示发布内容
     myRelease() {
-      window.location.href = '/personal/'+this.$store.state.account._id+'/release';
+      window.location.href = '/personal/'+ localStorage.getItem('account') +'/release';
     }
   },
   created() {

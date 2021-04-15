@@ -4,59 +4,28 @@
       <div class="section">
         <div class="section-header">
           <i class="el-icon-document-copy"></i>
-          <span>最热专题</span>
+          <span>热门标签</span>
         </div>
         <div class="section-body">
-          <div class="specials">
-            <div class="specialsCard">
-              <router-link to="#" class="specialsBanner">
+          <div class="specials" v-if="dataInit">
+            <div class="specialsCard" v-for="tagItem in hotTags" :key="tagItem.tag._id">
+              <router-link :to="{ name: 'funWithTag', params: {tag: tagItem.tag.name}}" params class="specialsBanner">
                 <img src="https://pic2.zhimg.com/100/v2-da73a95f212550700306980b57dbe611_hd.png" alt="">
               </router-link>
               <div class="specialsHeader">
                 <div class="specialsInfo">
-                  <a href="" class="specialsTitle">2021, 加油打工人</a>
+                  <router-link :to="{name: 'funWithTag', params: {tag: tagItem.tag.name}}" class="specialsTitle">{{tagItem.tag.name}}</router-link>
                   <div class="specialsMeta">
                     <span>2020-12-31 更新</span>
-                    <span>6,666,666 浏览</span>
+                    <span>{{tagItem.tag.followCount}} 关注</span>
                   </div>
                 </div>
-                <el-button type="primary" plain>关注专题</el-button>
+                <el-button type="primary" :plain="isfollowList[tagItem.tag.name]" @click="followTag(tagItem.tag.name)">{{isfollowList[tagItem.tag.name] ? '已关注' : '关注'}}</el-button>
               </div>
               <div class="contentList">
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
-                </div>
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
-                </div>
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
-                </div>
-              </div>
-            </div>
-            <div class="specialsCard">
-              <router-link to="#" class="specialsBanner">
-                <img src="https://pic2.zhimg.com/100/v2-da73a95f212550700306980b57dbe611_hd.png" alt="">
-              </router-link>
-              <div class="specialsHeader">
-                <div class="specialsInfo">
-                  <a href="" class="specialsTitle">2021, 加油打工人</a>
-                  <div class="specialsMeta">
-                    <span>2020-12-31 更新</span>
-                    <span>6,666,666 浏览</span>
-                  </div>
-                </div>
-                <el-button type="primary" plain>关注专题</el-button>
-              </div>
-              <div class="contentList">
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
-                </div>
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
-                </div>
-                <div class="contentItem">
-                  <a href="" class="contentTitle">2020 年春节，有哪些企业已经通知延迟复工？</a>
+                <div class="contentItem" v-for="(item, index) in tagItem.content" :key="index">
+                  <router-link :to="'user'" class="author">{{item.author}}</router-link>
+                  <router-link :to="'post/' + item._id" class="contentTitle">{{item.data.title}}</router-link>
                 </div>
               </div>
             </div>
@@ -92,18 +61,80 @@
 </template>
 
 <script>
+import { getFindIndex, followTag } from '@/axios/request';
+import loginJudge from '@/utils/loginJudge';
+
 export default {
   name: 'findIndex',
   data() {
     return {
-
+      hotTags: [], // 热门标签数据
+      isfollowList: {}, // 关注按钮的默认样式
+      dataInit: false // 数据是否初始成功
     }
   },
+  computed: {
+    
+  },
   methods: {
-
+    load() {
+      getFindIndex()
+      .then(res => {
+        if(res.data.message == 'success') {
+          for(let i in res.data.tag) {
+            this.hotTags[i] = {
+              tag: res.data.tag[i],
+              content: res.data.tagContent[i]
+            }
+            this.$set(this.isfollowList, res.data.tag[i].name, false);
+            if(this.$store.state.followTagsList.length != 0) {
+              for(let j of this.$store.state.followTagsList) {
+                if(j == res.data.tag[i].name) {
+                  this.$set(this.isfollowList, res.data.tag[i].name, true);
+                  break;
+                }
+              }  
+            }
+            
+          }
+          this.dataInit = true;
+        }
+        else {
+          this.$notify.error({
+            title: '错误',
+            message: '数据请求失败'
+          })
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      }) 
+    },
+    // 关注标签
+    followTag(name) {
+      if(!loginJudge.call(this)) return;
+      let params = {
+        key: this.$store.state.account.followTags,
+        tag: name
+      }
+      followTag(params)
+      .then(res => {
+        this.$store.commit('updateFollowTags', res.data.newFollowTags);
+        this.isfollowList[name] = !this.isfollowList[name];
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    // 改变关注按钮的样式
+    change(tag) {
+      console.log(this.isfollowList[tag]);
+      this.isfollowList[tag] = !this.isfollowList[tag];
+      console.log(this.isfollowList[tag]);
+    },
   },
   created() {
-
+    this.load();
   }
 }
 
@@ -111,6 +142,5 @@ export default {
 <style lang="scss" scoped>
 @import '@/style/commonValue';
 @import '@/style/funHomePage';
-
 
 </style>

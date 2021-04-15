@@ -12,12 +12,12 @@
           <nav class="nav">
             <div class="left">
               <img src="~@/assets/ttt.jpg" alt="" class="tag-icon">
-              <el-button type="success" size="small" plain>关注</el-button>
+              <el-button type="success" size="small" :plain="isFollowTag" @click="followTag">{{isFollowTag ? '已关注' : '关注'}}</el-button>
             </div>
-						<el-menu default-active="hotest" router mode="horizontal" active-text-color="#fAAf00">
-							<el-menu-item index="hotest" >热门</el-menu-item>
-							<el-menu-item index="latest" >最新</el-menu-item>
-							<el-menu-item index="well" >收益</el-menu-item>
+						<el-menu :default-active="bySort" router mode="horizontal" active-text-color="#fAAf00">
+							<el-menu-item index="hotest" :route="pathList(0)">热门</el-menu-item>
+							<el-menu-item index="latest" :route="pathList(1)">最新</el-menu-item>
+							<el-menu-item index="well" :route="pathList(2)">收益</el-menu-item>
 						</el-menu>
 					</nav>
           <transition-group>
@@ -28,7 +28,7 @@
                   <li>{{releaseData(list.data.releaseTime)}}</li>
                   <li>
                     <router-link v-for="(item,index) in list.data.tags" :key="index"
-                    :to="'/fun?tag=' + item" target="_blank" class="tags">{{item}}</router-link>
+                    :to="{name: 'funWithTag', params: {tag: item.name}}" target="_blank" class="tags">{{item.name}}</router-link>
                   </li>
                 </ul>
                 <h2>
@@ -40,7 +40,7 @@
                       <button :class="{agree: isVoteUp(list._id)}"><i class="lj-icon-dianzanqian"></i> {{list.voteup_count}}</button>
                     </span>
                     <span>
-                      <a href="/post#comment" target="_blank"><i class="el-icon-s-comment">&nbsp;{{list.comment_count}} 条评论</i></a> 
+                      <router-link :to="'/post/' + list._id + '#comment'" target="_blank"><i class="el-icon-s-comment">&nbsp;{{list.comment_count}} 条评论</i></router-link> 
                     </span>
                     <span>
                       <i class="el-icon-share">&nbsp;分享</i>
@@ -64,8 +64,9 @@
 </template>
 
 <script>
-import { getTagMain, updatePartTimeWork } from '@/axios/request';
-import showTime from '@/assets/utils/showTime';
+import { getTagMain, updatePartTimeWork, followTag } from '@/axios/request';
+import showTime from '@/utils/showTime';
+import loginJudge from '@/utils/loginJudge';
 
 
 export default {
@@ -75,12 +76,22 @@ export default {
       return this.$route.params.tag;
     },
     tagMeta() {
-      return '366895 关注，48562 文章';
+      return (this.Meta.length ? this.Meta[0].followCount : '0') + ' 关注，' + this.lists.length + ' 文章';
+    },
+    bySort() {
+      return this.$route.query.sort ? this.$route.query.sort : 'hotest';
     }
   },
   data() {
     return {
-			lists: []
+      Meta: [], // 标签云数据
+			lists: [],
+      isFollowTag: false // 是否为已关注标签
+    }
+  },
+  watch: {
+    '$route.query.sort': function(newValue) {
+      this.load(newValue);
     }
   },
   methods: {
@@ -95,10 +106,38 @@ export default {
       }
       return false;
     },
-		load () {
-			getTagMain({tag: this.$route.params.tag})
+    // 关注标签
+    followTag() {
+      if(!loginJudge.call(this)) return;
+      let params = {
+        key: this.$store.state.account.followTags,
+        tag: this.tagName
+      }
+      followTag(params)
+      .then(res => {
+        this.$store.commit('updateFollowTags', res.data.newFollowTags);
+        this.isFollowTag = !this.isFollowTag;
+      })
+      .catch(err => {
+        console.log(err);
+      })
+    },
+    pathList(type) {
+			if(type == 0) {
+				return {path: this.$route.path, query: {sort: 'hotest'}};
+			}else if(type == 1) {
+				return {path: this.$route.path, query: {sort: 'latest'}};
+			}else if(type == 2) {
+				return {path: this.$route.path, query: {sort: 'well'}};
+			}else {
+				return;
+			}
+		},
+		load (newValue) {
+			getTagMain({tag: this.$route.params.tag, sort: newValue})
 			.then(res => {
-				this.lists = res.data;
+        this.Meta = res.data.tagMeta;
+				this.lists = res.data.tagContent;
 			})
 			.catch(err => {
 				console.log(err);
@@ -134,7 +173,8 @@ export default {
 		}
   },
   created() {
-		this.load();
+    this.isFollowTag = this.$store.state.followTagsList.includes(this.tagName) ? true : false;
+		this.load('hotest');
   }
 }
 

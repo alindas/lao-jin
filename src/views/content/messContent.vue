@@ -3,8 +3,8 @@
     <div class="container">
       <div class="main">
         <div class="article-support-panel">
-          <div class="panel-btn lj-icon-zan" :style="isVoteUp ? {color: '#fAAf00'} : {}" @click="voteUp"><span class="badge">{{articleLikeCount}}</span></div>
-          <a class="panel-btn el-icon-chat-dot-round" href="#comment" ><span class="badge">{{articleCommentCount}}</span></a>
+          <div class="panel-btn lj-icon-zan" :style="isVoteUp ? {color: '#fAAf00'} : {}" @click="voteUp"><span class="badge" v-show="articleLikeCount">{{articleLikeCount}}</span></div>
+          <a class="panel-btn el-icon-chat-dot-round" href="#comment" ><span class="badge" v-show="articleCommentCount">{{articleCommentCount}}</span></a>
           <div class="panel-btn el-icon-star-off" :style="isCollect ? {color: '#fAAf00'} : {}" @click="collect"></div>
         </div>
         <div class="list" v-if="init">
@@ -101,34 +101,9 @@
                   <li>
                       <i class="el-icon-star-on"></i>
                       <span>我的收藏</span>
-                      <span class="right-below-ul-num">0</span>
+                      <span class="right-below-ul-num">1</span>
                   </li>
-                  <li>
-                      <i class="el-icon-question"></i>
-                      <span>我关注的问题</span>
-                      <span class="right-below-ul-num">0</span>
-                  </li>
-                  <li>
-                      <i class="el-icon-plus"></i>
-                      <span>我的邀请</span>
-                      <span class="right-below-ul-num">0</span>
-                  </li>
-                  <li>
-                      <i class="el-icon-s-finance"></i>
-                      <span>我的余额</span>
-                  </li>
-                  <li>
-                      <i class="el-icon-s-operation"></i>
-                      <span>站务中心</span>
-                  </li>
-                  <li>
-                      <i class="el-icon-bangzhu"></i>
-                      <span>帮助中心</span>
-                  </li>
-                  <li>
-                      <i class="el-icon-key"></i>
-                      <span>版权服务中心</span>
-                  </li>
+                  
               </ul>
           </div>
         </div>
@@ -147,8 +122,9 @@ import {
   articleApply, 
   showUserArticleMess,
   followAuthor } from '@/axios/request';
-import showTime from '@/assets/utils/showTime';
-import { getCursorPosition, setCursorPosition } from '@/assets/utils/handleCursorPosition';
+import showTime from '@/utils/showTime';
+import loginJudge from '@/utils/loginJudge';
+import { getCursorPosition, setCursorPosition } from '@/utils/handleCursorPosition';
 
 export default {
   name: 'messContent',
@@ -157,10 +133,10 @@ export default {
       return localStorage.getItem('account') ? true : false;
     },
     articleCommentCount() {
-      return this.mainData.comment_count ? this.mainData.comment_count : '';
+      return this.mainData.comment_count;
     },
     articleLikeCount() {
-      return this.mainData.voteup_count ? this.mainData.voteup_count : '';
+      return this.mainData.voteup_count;
     },
     articleCollectionCount() {
       return this.mainData.collect_count ? this.mainData.collect_count : '';
@@ -230,13 +206,16 @@ export default {
     },
     // 返回内容发布时间
     releaseData(date) {
-      return date.substr(0,4) + '年' + date.substr(5,2) + '月' + date.substr(8,2) + '日';
+      const p1 = date.split(' ')[0];
+      const p2 = p1.split('-');
+      return p2[0] + '年' + p2[1] + '月' + p2[2];
     },
     applyTime(date) {
       return showTime(date);
     },
     // 关注作者
     follow() {
+      if(!loginJudge.call(this)) return;
       let option = this.isFollow;
       let params = {};
       let type = 'cancel';
@@ -309,7 +288,7 @@ export default {
         updatePartTimeWork(params)
         .then(res => {
           if(res.data.message == 'success') {
-            this.$store.commit('updateCollectList', res.data.newCollectList);
+            this.$store.commit('initCollectList', res.data.newCollectList);
           }
           else {
             this.$message.error('请求失败，请稍后重试');

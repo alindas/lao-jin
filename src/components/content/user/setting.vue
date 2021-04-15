@@ -180,9 +180,7 @@ export default {
       isSend: false,
       verifyCD: null,
       subnav: [
-        {name: '<返回个人主页',path: ''},
-        {name: '个人资料',path: '/personal/settings/profile'},
-        {name: '账号设置',path: '/personal/settings/account'},
+        {name: '<返回个人主页',path: ''}
       ],
       userInfo: {},
       loginFormPhone: {
@@ -216,13 +214,15 @@ export default {
         this.userInfo.avatar = res.data;
         this.$notify.success({
           title: '头像更换成功',
-          showClose: false
+          showClose: false,
+          duration: 2000
         })
       }
       else {
         this.$notify.error({
           title: res.message,
-          showClose: false
+          showClose: false,
+          duration: 2000
         })
       }
     },
@@ -398,6 +398,14 @@ export default {
   },
   created() {
     this.userInfo = this.$store.state.account;
+    this.subnav[1] = {
+      name: '个人资料',
+      path: '/personal/' + localStorage.getItem('account') + '/settings/profile'
+    };
+    this.subnav[2] = {
+      name: '账号设置',
+      path: '/personal/' + localStorage.getItem('account') + '/settings/account'
+    }
     this.view = this.$route.path.includes('profile') ? true : false;
     this.subnav[0].path = '/personal/' + this.$store.state.account._id;
   },

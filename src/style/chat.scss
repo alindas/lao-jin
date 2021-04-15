@@ -49,29 +49,33 @@
   -webkit-box-direction: reverse;
 }
 
-.receiver {
+.sender {
   color: #fff;
   background-color: #fAA755;
   &::after {
     content: "";
     position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    white-space: nowrap;
     border: 8px solid transparent;
     border-left: 8px solid #fAA755;
-    right: -15px;
-    top: 14px;
   }
 }
 
-.sender {
+.receiver {
   color: #444;
   background-color: #f1f1f1;
   &::after {
     content: "";
     position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
     border: 8px solid transparent;
     border-right: 8px solid #f1f1f1;
-    left: -15px;
-    top: 14px;
+    white-space: nowrap;
   }
 }
 
@@ -101,6 +105,7 @@
   .message-content {
     display: flex;
     margin: 0 10px;
+    max-width: 350px;
     align-items: center;
     -webkit-box-align: center;
     .message-text {

@@ -1,19 +1,55 @@
 .list {
-  min-height: 500px;
-  border-bottom: 1px solid #f0f2f7;
+  // min-height: 500px;
+  border-top: 1px solid #f0f2f7;
   padding: 20px;
   box-sizing: border-box;
   background: #fff;
-  box-shadow: 0 1px 3px rgba(18, 18, 18, 0.1);
+  .emptyBox {
+    text-align: center;
+    height: 88px;
+    line-height: inherit;
+    color: #909399;
+    font-size: 14px;
+  }
+  .tagsAndUsers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .avatar-link {
+      width: 40px;
+      height: 40px;
+      margin-right: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      img {
+        width: 100%;
+      }
+    }
+    .meta {
+      flex: 1;
+      display: inline-block;
+      h4 {
+        font-size: 18px;
+      }
+      span {
+        font-size: 12px;
+        color: #646464;
+      }
+    }
+  }
   .meta-list {
     display: flex;
     justify-content: left;
     color: #909399;
     font-size: 12px;
     li {
-      &:first-child:hover {
-        cursor: pointer;
-        color: $selected-color;
+      &:first-child {
+        a {
+          color: #909399;
+          &:hover {
+            color: $selected-color;
+          }
+        }
       }
       &:nth-child(-n+2)::after {
         content: '·';
@@ -111,5 +147,13 @@
   background-color: #fff;
   &:hover {
     background-color: #f6f6f6
+  }
+}
+
+.el-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  .el-checkbox {
+    line-height: 25px;
   }
 }

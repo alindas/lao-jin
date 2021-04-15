@@ -11,17 +11,21 @@
                   v-model="chatSearchName"
                   placeholder="搜索联系人"
                   clearable
+                  @change="search"
                   @focus="bol = true"
                   @blur="bol = false">
                 <i class="el-icon-search el-input__icon search" slot="suffix" :class="{hidden:bol}"></i>
                 </el-input>
               </div>
-              <div class="chatListGroup" v-show="bol">
-                <div class="content searchGroup">
-                  <div class="list-item" v-for="(item,index) in SearchUserList.phoneRegister" :key="index"
-                    >
+              <div class="chatListGroup" v-show="bol || contactsFocus">
+                <div class="content searchGroup"
+                  @mouseenter="contactsFocus = true" 
+                  @mouseleave="contactsFocus = false"
+                  @click="contactsFocus = false">
+                  <div class="list-item" v-for="(item,index) in SearchUserList" :key="index"
+                    @click="goChat(item)">
                     <div class="avatar">
-                      <img src="@/assets/head-pic.png" alt="">
+                      <img :src="Avatar(item.avatar)" alt="">
                     </div>
                     <div class="list-item-content">
                       <div class="user-name">
@@ -34,7 +38,7 @@
                   </div>
                 </div>
               </div>
-              <div class="chatListGroup" v-show="!bol">
+              <div class="chatListGroup" v-show="!bol && !contactsFocus">
                 <h3 class="title" @click="showChatListGroup = !showChatListGroup">
                   <span>最近联系</span>
                   <i class="el-icon-arrow-right" :style="titleState"></i>
@@ -42,7 +46,7 @@
                 <div class="content" :style="contentState">
                   <div class="list-item" v-for="(item,index) in MessageList" :key="index"
                     :style="currentSession(item._id)" 
-                    @click="current = item._id">
+                    @click="changeChatView(item)">
                     <div class="avatar">
                       <img :src="item.sessionA.account == loginedAcc ? Avatar(item.sessionB.avatar) : Avatar(item.sessionA.avatar)" alt="">
                     </div>
@@ -67,7 +71,7 @@
             <div class="chatBox">
               <Chat v-if="init" 
                 :current-message-key="currentMessageKey" 
-                :current-session-resources="currentSessionResources"
+                :current-session-resources="receiver"
                 :sendStatus="sendStatus" 
                 @SendMess="sendMessage(arguments)"
                 @DeleteMess="deleteMess"/>
@@ -82,7 +86,11 @@
 
 <script>
 import Chat from '@/components/common/chat';
-import { getChatMessage, userSearch, sendChatMessage } from '@/axios/request';
+import { getChatMessage, 
+  getIndexMain, 
+  sendChatMessage,
+  createNewChat } from '@/axios/request';
+import { debounce } from '@/utils/performanceOptimization';
 
 export default {
   name: 'letter',
@@ -106,22 +114,6 @@ export default {
       }
       return null;
     },
-    currentSessionResources() {
-      for(let i of this.MessageList) {
-        if(i._id == this.current) {
-          return i.accountA == this.loginedAcc ? 
-          {
-            name: i.sessionB.name,
-            avatar:  i.sessionB.avatar
-          } : 
-          { 
-            name: i.sessionA.name,
-            avatar:  i.sessionA.avatar
-          }
-        }
-      }
-      return null;
-    },
     // 用于辨别私信数据中的己方和对方数据
     loginedAcc() {
       return localStorage.getItem('account');
@@ -131,16 +123,18 @@ export default {
   data() {
     return {
       init: false, // 数据是否已完成初始化
-      sendStatus: 0, // 用于回调chat 组件发送状态
+      sendStatus: null, // 用于驱动chat 组件更新内容
       bol: false, // 检索输入框状态码
+      contactsFocus: false, // 如果当前在搜索用户展示列表中则不关闭展示页面
       chatSearchName: '',
       showChatListGroup: true,  // 是否展开用户聊天列表
       current: '',  // 当前聊天窗口标记
+      receiver: '', // 当前窗口会话人
       MessageList: [],  // 用户联系人列表
       // 用于是否产生时间线标记
       MessageListStatus: {},
       SearchUserList: {}, // 储存用户搜索结果集
-      searchCD: null, // 用户搜索框节流码
+      searchCD: null, // 用户搜索框防抖
     }
   },
   watch: {
@@ -165,9 +159,14 @@ export default {
     Avatar(data) {
       return 'data:'+data.minetype+';base64,'+data.base64;
     },
+    // 更换对话窗口
+    changeChatView(item) {
+      this.current = item._id;
+      this.receiver = item.sessionA.account == this.loginedAcc ?   
+        item.sessionB : item.sessionA;
+    },
     // chat 聊天框的消息发送
     sendMessage(data) {
-      console.log(data);
       let preTime = this.MessageListStatus[this.current];
       let timeline = true;
       if(preTime && data[0].time - preTime < 300000) {
@@ -175,33 +174,41 @@ export default {
       }
       this.MessageListStatus[this.current] = data[0].time;
       // 包装发送数据
-      let chatContent = {};
-      chatContent.key = this.current;
-      chatContent.contentKey = data[0].contentKey;
-      chatContent.sendDate = data[0].date;
-      chatContent.content = {
+      let content = {
         "name":  this.loginedAcc,
         "text": data[0].value,
         "timeLine": timeline,
         "read": false
       };
-      chatContent.latestTime = data[0].date.substr(5,5);
-      chatContent.latestContent = data[0].value;
+      let chatContent = {
+        key: this.current,
+        receiver: this.receiver.account,
+        contentKey: data[0].contentKey,
+        sendDate: data[0].date,
+        content,
+        latestTime: data[0].date.substr(5,5),
+        latestContent: data[0].value
+      };
       sendChatMessage(chatContent)
       .then(res => {
         /** 更新视图 */
-        this.sendStatus ++;
+        for(let item of this.MessageList) {
+          if(item._id === this.current) {
+            item.latestTime = chatContent.latestTime;
+            item.latestContent = chatContent.latestContent;
+            break;
+          }
+        }
+        this.sendStatus = {
+          key: data[0].date,
+          content
+        };
       })
       
     },
     // 删除chat 聊天框的信息记录
     deleteMess(key) {
-      for(let item in this.MessageList[this.current].content) {
-          if(item == key) {
-            delete this.MessageList[this.current].content[item];
-            return;
-          }
-        }
+      console.log(`${key}已删除`);
     },
     // 删除聊天对话框列表
     deleteDialog(key) {
@@ -218,19 +225,19 @@ export default {
       .then(() => {
         // 获取对话列表的key 值，如果当前chat 对话框为要删除的列表key 值，
         // 则获取它的上一或下一对话列表key 并赋值给chat 对话框
-        let MessageListKeys = Object.keys(this.MessageList);
-        for(let i = 0;i<MessageListKeys.length;i++) {
-          if(MessageListKeys[i] == key) {
-            delete this.MessageList[MessageListKeys[i]];
-            if(this.current == MessageListKeys[i]) {
-              if(MessageListKeys[i+1]) {
-                this.current = MessageListKeys[i+1];
+        for(let i = 0;i<this.MessageList.length;i++) {
+          if(i == key) {
+            if(this.current == this.MessageList[i]._id) {
+              if(this.MessageList[i+1]) {
+                this.current = this.MessageList[i+1]._id;
               }
-              else if(MessageListKeys[i-1]) {
-                this.current = MessageListKeys[i-1];
+              else if(this.MessageList[i-1]) {
+                this.current = this.MessageList[i-1]._id;
               }
               else this.current = '';
             }
+            this.MessageList.splice(i,1);
+            // delete this.MessageList[MessageListKeys[i]];
             this.$forceUpdate();
             return;
           }
@@ -242,21 +249,44 @@ export default {
       
     },
     // 检索联系人
-    search(val) {
-      /**
-       * 这里实现检索请求的防抖操作，没有输入动作500ms 后请求资源
-       */
-      clearTimeout(this.searchCD);
+    search() {
+      if(this.chatSearchName == '') {
+        this.SearchUserList = [];
+        return false;
+      } else if(this.searchCD) {
+        clearTimeout(this.searchCD);
+      }
       this.searchCD = setTimeout(() => {
-        console.log(val);
-        userSearch()
+        console.log('sss');
+        getIndexMain({
+          type: 'search',
+          query: this.chatSearchName,
+          searchType: 'users'
+        })
         .then(res => {
           this.SearchUserList = res.data;
         })
         .catch(err => {
           console.log(err);
         })
-      },800)
+      }, 800)
+    },
+    // 点击搜索的联系人家在会话
+    goChat(contacts) {
+      console.log('here');
+      const sponsor = {
+        _id: this.$store.state.account._id,
+        name: this.$store.state.account.name,
+        avatar: this.$store.state.account.avatar
+      };
+      const receiver = contacts;
+      createNewChat({ sponsor, receiver })
+      .then(res => {
+        this.current = res.data.chat._id;
+      })
+    },
+    handle() {
+      console.log('XXX');
     },
     // 加载组件元数据
     load() {
@@ -268,6 +298,12 @@ export default {
       .then(res => {
         this.init = true;
         this.MessageList = res.data;
+        for(let item of this.MessageList) {
+          if(item._id == this.current) {
+            this.changeChatView(item);
+            break;
+          }
+        }
       })
       .catch(err => {
         console.log(err);

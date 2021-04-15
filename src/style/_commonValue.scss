@@ -35,16 +35,45 @@ $large-font-size: 16px;
 }
 
 // vue transition 过渡动画
-@mixin animate($translate: translateY(20px)) {
+@mixin animate() {
   .v-enter-active {
-    transition: all .3s ease;
-  }
-  .v-leave-active {
     transition: all .5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
   }
-  .v-enter,
-  .v-leave-to {
-    transform: $translate;
+  .v-enter {
+    transform: scale(0);
     opacity: 0;
+  }
+}
+
+// 导航栏菜单悬浮颜色
+.el-menu.el-menu--horizontal {
+  >.el-menu-item {
+    &:hover {
+      color: $selected-color;
+    }
+  }
+}
+
+// 搜索栏建议列表
+.el-scrollbar {
+  ul {
+    li {
+      .histClose {
+        &:hover {
+          color: $selected-color;
+        }
+        float: right;
+        padding-right: 1rem;
+        line-height: inherit;
+      }
+    }
+  }
+}
+
+@mixin rotateAnimation {
+  @keyframes refreshRotate {
+    100% {
+      transform: rotateZ(-360deg);
+    }
   }
 }

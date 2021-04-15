@@ -25,37 +25,13 @@ const routes = [{
   {
     path: '/index',
     component: Index,
-    beforeEnter: (to, from, next) => {
-      router.app.$options.store.getters.initState && next();
-    },
     redirect: '/index/recommend',
     children: [{
-        path: 'recommend',
-        meta: { title: '首页 - 推荐' },
-        component: () =>
-          import ('@/components/content/index/indexMain'),
-      },
-      {
-        path: 'inside',
-        meta: { title: '首页 - 校内兼职' },
-        component: Demo,
-      },
-      {
-        path: 'outside',
-        meta: { title: '首页 - 校外兼职' },
-        component: Demo,
-      },
-      {
-        path: 'lwork',
-        meta: { title: '首页 - 长期工' },
-        component: Demo,
-      },
-      {
-        path: 'swork',
-        meta: { title: '首页 - 短期工' },
-        component: Demo,
-      }
-    ]
+      name: 'indexContent',
+      path: '/index/:type',
+      component: () =>
+        import ('@/components/content/index/indexMain')
+    }, ]
   },
   // 信息页面主体
   {
@@ -96,14 +72,78 @@ const routes = [{
         component: () =>
           import ('@/components/content/user/centerShow'),
       },
+      {
+        path: 'follows',
+        meta: { title: '个人主页 - 关注列表' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'fans',
+        meta: { title: '个人主页 - 粉丝列表' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'balance',
+        meta: { title: '个人主页 - 账号交易' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'collection',
+        meta: { title: '个人主页 - 收藏' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
     ]
   },
   // 个人设置路由
   {
-    path: '/personal/settings/:type',
+    path: '/personal/:account/settings/:type',
     meta: { title: '设置' },
     component: () =>
       import ('@/components/content/user/setting'),
+  },
+  // 用户主页路由
+  {
+    path: '/user/:id',
+    name: 'user',
+    redirect: { name: 'userActivities' },
+    component: () =>
+      import ('@/views/personal/user'),
+    children: [{
+        path: 'activities',
+        name: 'userActivities',
+        meta: { title: '个人主页 - 动态' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'release',
+        meta: { title: '个人主页 - 发布内容' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'likes',
+        meta: { title: '个人主页 - 喜欢' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'follows',
+        meta: { title: '个人主页 - 关注列表' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+      {
+        path: 'fans',
+        meta: { title: '个人主页 - 粉丝列表' },
+        component: () =>
+          import ('@/components/content/user/centerShow'),
+      },
+    ]
   },
   // 私信聊天路由
   {
@@ -137,7 +177,21 @@ const routes = [{
   {
     path: '/relax',
     meta: { title: '茶水间' },
-    component: Demo,
+    component: () =>
+      import ('@/views/fastService/index'),
+  },
+  // 跑腿服务订单刷新中间件
+  {
+    path: '/middleware/:id',
+    replace: '/fastservice/:id'
+  },
+  // 跑腿服务订单准备页
+  {
+    path: '/fastservice/:id',
+    name: 'fastService',
+    meta: { title: '订单确认' },
+    component: () =>
+      import ('@/views/fastService/orderBody')
   },
   // 第二页面路由
   {
@@ -169,6 +223,55 @@ const routes = [{
           import ('@/components/common/Error')
       }
     ]
+  },
+  // 系统后台管理页面
+  {
+    path: '/system',
+    redirect: '/system/entry'
+  },
+  // 后台登录页
+  {
+    path: '/system/entry',
+    meta: { title: '捞金-系统登录' },
+    component: () =>
+      import ('@/system/components/Entry')
+  },
+  // 后台首页
+  {
+    path: '/system',
+    component: () =>
+      import ('@/system/components/Home'),
+    children: [{
+      path: 'home',
+      name: 'SysHome',
+      meta: { title: '捞金-系统首页' },
+      component: () =>
+        import ('@/system/components/Index')
+    }, {
+      path: 'verifyInfo',
+      name: 'VerifyInfo',
+      component: () =>
+        import ('@/system/components/InfoManage'),
+      childrend: [{}]
+    }, {
+      path: 'userList',
+      name: 'SysUserList',
+      meta: { title: '捞金-用户列表' },
+      component: () =>
+        import ('@/system/components/SysUserList'),
+    }, {
+      path: 'planList',
+      name: 'SysPlanList',
+      meta: { title: '捞金-任务计划列表' },
+      component: () =>
+        import ('@/system/components/SysPlanList'),
+    }, {
+      path: 'set',
+      name: 'SysSetUp',
+      meta: { title: '捞金-系统管理' },
+      component: () =>
+        import ('@/system/components/Setup')
+    }]
   },
   // 错误url 返回首页
   {

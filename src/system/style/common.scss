@@ -1,0 +1,64 @@
+// 公共样式
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
+  font-size: 15px;
+  color: #121212;
+  background: $bg;
+}
+
+textarea {
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei, Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: #121212;
+  text-decoration: none;
+}
+
+.clear:after,
+.clear:before {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+// elementUI 的全局对话框样式
+.chatRemoveDialog,
+.draftsRemoveDialog {
+  .el-message-box__title {
+    font-size: 22px;
+  }
+  .el-message-box__content {
+    font-size: 16px;
+  }
+  .el-message-box__btns {
+    display: flex;
+    justify-content: center;
+    .el-button {
+      margin: 0 20px !important;
+      +.el-button {
+        transform: translateX(0);
+      }
+    }
+  }
+  .confirmButton,
+  .cancelButton {
+    width: 150px;
+    height: 40px;
+    font-size: 14px;
+  }
+}
+
+// nprogress 顶部进度条自定义颜色
+#nprogress .bar {
+  background: #fAAf00 !important;
+}

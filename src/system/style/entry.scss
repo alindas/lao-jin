@@ -1,0 +1,98 @@
+.entry-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  .entry-main {
+    padding: 10px;
+  }
+}
+
+.logo {
+  width: 100%;
+  height: 100px;
+  text-align: center;
+  .avatar {
+    display: inline-block;
+    width: 150px;
+    height: 100px;
+  }
+}
+
+.login {
+  margin-top: 35px;
+  padding: 10px 0;
+  width: 400px;
+  height: 230px;
+  box-shadow: 0 0 1px 1px rgba(189, 176, 176, 0.438);
+  border-radius: 3px;
+  background-color: #ffffff;
+}
+
+.login-header {
+  width: 400px;
+  height: 50px;
+  text-align: center;
+  .avatar {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    color: #fAAf00;
+    font-size: 25px;
+    line-height: 40px;
+    background-color: rgba(201, 185, 185, 0.2);
+  }
+}
+
+.login-form {
+  width: 400px;
+  .username,
+  .password {
+    box-sizing: border-box;
+    width: 400px;
+    height: 45px;
+    padding: 5px 20px;
+    .container {
+      box-sizing: border-box;
+      width: 100%;
+      height: 45px;
+      display: flex;
+      border-bottom: 1px solid #ebebeb;
+      input {
+        width: 100%;
+        height: 35px;
+        font-size: 15px;
+        border: none;
+        outline: none;
+      }
+      .input-icon {
+        line-height: 45px;
+      }
+    }
+  }
+}
+
+.button {
+  margin: 20px 0 10px;
+  width: 400px;
+  box-sizing: border-box;
+  text-align: center;
+  .login-btn {
+    width: 350px;
+    height: 33px;
+    border-radius: 3px;
+    background-color: #fAAf00;
+    color: #ffffff;
+    font-size: 15px;
+    line-height: 33px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+}
+
+.icon {
+  color: #666666;
+  cursor: pointer;
+}

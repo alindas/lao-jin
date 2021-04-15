@@ -24,9 +24,7 @@
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
-                  <router-link :to="draftsPath">
-                    我的发布
-                  </router-link>
+                  <a @click="myRelease">我的发布</a>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -55,15 +53,12 @@
 
 <script>
 import { getCenterMessage, deleteCenterMessage } from '@/axios/request';
-import showTime from '@/assets/utils/showTime';
+import showTime from '@/utils/showTime';
 
 
 export default {
   name: 'drafts',
   computed: {
-    draftsPath() {
-      return '/personal/' + this.$store.state.account._id + '/release';
-    }
   },
   data() {
     return {
@@ -116,8 +111,12 @@ export default {
     JumpPage(url) {
       this.$router.push(url);
     },
+    // 返回我的主页并显示发布内容
+    myRelease() {
+      window.location.href = '/personal/'+ localStorage.getItem('account') +'/release';
+    },
     load() {
-      getCenterMessage({type: 'drafts', key: this.$store.state.account.drafts})
+      getCenterMessage({type: 'drafts', key: localStorage.getItem('drafts')})
         .then(res => {
           this.draftsList = res.data[0];
         })
