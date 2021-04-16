@@ -29,7 +29,7 @@
       </div>
       <div class="orderTimeline">
         <el-timeline>
-          <el-timeline-item v-for="item in order.timeLines" :key="item.content" 
+          <el-timeline-item v-for="item in order.timeLines" :key="order._id + item.content" 
           :timestamp="item.timestamp" placement="top">
             <el-card>
               <h4>{{item.content}}</h4>
@@ -45,6 +45,8 @@
 
 <script>
 import { getLightDemandSingle, updataLightDemand, createNewChat } from '@/axios/request';
+import formatDate from '@/utils/dataFormate';
+
 export default {
   name: 'orderBody',
   data() {
@@ -92,10 +94,38 @@ export default {
   methods: {
     async load() {
       const id = this.$route.params.id;
-      let res = await getLightDemandSingle({id});
-      this.order = res.data.contentBody;
+      await getLightDemandSingle({id})
+      .then(res => {
+        if(Object.keys(res.data).length != 0) {
+          this.order = res.data.contentBody;
+        }
+        else {
+          this.$router.push('/relax');
+          this.$message.warning('该订单不存在或已被删除');
+        }
+      })
+      .catch(error => {
+        this.$router.push('/relax');
+        this.$message.warning('该订单不存在或已被删除');
+      })
     },
     orderAction(type) {
+      let reqType = type;
+      if(type == 'finish') {
+        if(this.order.Sponsor._id == localStorage.getItem('account')) {
+          if(this.order.Sponsorfinish) {
+            this.$message.warning('订单送签收请求已提交，请勿重复提交');
+            return;
+          }
+          else reqType = 'sponsorFinish';
+        }else {
+          if(this.order.Receiverfinish) {
+            this.$message.warning('订单送达请求已提交，请勿重复提交');
+            return;
+          }
+          else reqType = 'receiverFinish';
+        }
+      }
       const data = {
         id: this.$route.params.id,
         reward: this.order.reward,
@@ -105,18 +135,18 @@ export default {
       if(type != 'cancel') {
         let { avatar:ravatar, ...receiver } = this.order.Receiver;
         data.receiver = receiver;
+        data.finishTimeLines = formatDate('Y/M/d h:m');
       }
-      const reqType = type == 'finish' ? 
-        (sponsor._id == localStorage.getItem('account') ? 'sponsorFinish' : 'receiverFinish') :
-        type;
       data.reqType = reqType;
       updataLightDemand(data)
       .then(res => {
         if(res.data.message === 'success') {
-          this.$router.push('/relax');
           this.$message({
-            message: res.data.decs
+            type: 'success',
+            message: res.data.desc
           });
+          this.$parent.reload();
+          
         }
       })
     },

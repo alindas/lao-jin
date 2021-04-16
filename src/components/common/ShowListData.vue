@@ -6,7 +6,7 @@
       </div>
       <div class="header-info-opitons">
         <div class="select-options">
-          <el-select v-model="selectKey" size="small" placeholder="条件过滤">
+          <el-select v-model="selectKey" size="small" placeholder="条件过滤" @change="setSelectKey">
             <el-option
               v-for="item in selectKeys"
               :key="item.value"
@@ -130,6 +130,9 @@ export default {
     }
   },
   methods: {
+    setSelectKey() {
+      this.$emit('selectData', this.selectKeys);
+    },
     searchData() {
       this.$emit('searchData', this.searchKey);
     },

@@ -77,37 +77,33 @@
           </div>
         </div>
       </div>
-      <div class="right">
-        <div class="right-top">
-          <div class="author-title">关于作者</div>
-          <div class="author-body">
-            <router-link :to="'/users/' + mainData.author_link" target="_blank" class="user-item item">
-              <img :src="Avatar(mainData.author_avatar)" alt="">
-              <span class="uname">{{mainData.author}}</span>
-            </router-link>
-            <div class="stat-item item">
-              <i class="lj-icon-dianzanqian"></i>
-              <span class="content">获得点赞<span class="count">{{authorData[0]}}</span></span>
-            </div>
-            <div class="stat-item item">
-              <i class="el-icon-view"></i>
-              <span class="content">兼职发布数量<span class="count">{{authorData[1]}}</span></span>
+      <SidebarLayout 
+        :page-y-offset = "188"
+        fixed-distance = "40%"
+        >
+        <template v-slot:top>
+          <div class="right-top">
+            <div class="author-title">关于作者</div>
+            <div class="author-body">
+              <router-link :to="'/users/' + mainData.author_link" target="_blank" class="user-item item">
+                <img :src="Avatar(mainData.author_avatar)" alt="">
+                <span class="uname">{{mainData.author}}</span>
+              </router-link>
+              <div class="stat-item item">
+                <i class="lj-icon-dianzanqian"></i>
+                <span class="content">获得点赞<span class="count">{{authorData[0]}}</span></span>
+              </div>
+              <div class="stat-item item">
+                <i class="el-icon-view"></i>
+                <span class="content">兼职发布数量<span class="count">{{authorData[1]}}</span></span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="right-below">
-          <div class="right-below-nav">
-              <ul class="right-below-ul">
-                  <li>
-                      <i class="el-icon-star-on"></i>
-                      <span>我的收藏</span>
-                      <span class="right-below-ul-num">1</span>
-                  </li>
-                  
-              </ul>
-          </div>
-        </div>
-      </div>
+        </template>
+        <template v-slot:common>
+          <AppLinks />
+        </template>
+      </SidebarLayout>
     </div>
     
   </section>
@@ -125,9 +121,15 @@ import {
 import showTime from '@/utils/showTime';
 import loginJudge from '@/utils/loginJudge';
 import { getCursorPosition, setCursorPosition } from '@/utils/handleCursorPosition';
+import SidebarLayout from '@/components/sidebar/SidebarLayout';
+import AppLinks from '@/components/sidebar/appLinks';
 
 export default {
   name: 'messContent',
+  components: {
+    SidebarLayout,
+    AppLinks
+  },
   computed: {
     logined() {
       return localStorage.getItem('account') ? true : false;
@@ -201,7 +203,7 @@ export default {
         return 'data:' + data.mimetype + ';base64,' + data.base64;
       }
       else {
-        return 'data:' + this.$store.state.account.avatar.mimetype + ';base64,' + this.$store.state.account.avatar.base64;
+        return this.logined ? ('data:' + this.$store.state.account.avatar.mimetype + ';base64,' + this.$store.state.account.avatar.base64) : '';
       }
     },
     // 返回内容发布时间

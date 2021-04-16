@@ -20,7 +20,11 @@
 					</nav>
 						<router-view/>
 				</div>
-				<MainSidebar/>
+				<SidebarLayout fixed-distance="40%">
+					<template v-slot:common>
+						<AppLinks />
+					</template>
+				</SidebarLayout>
 			</div>
 		</section>
 	</div>
@@ -28,7 +32,8 @@
 </template>
 
 <script>
-import MainSidebar from '@/components/sidebar/mainSidebar';
+import SidebarLayout from '@/components/sidebar/SidebarLayout';
+import AppLinks from '@/components/sidebar/appLinks';
 
 export default {
 	name: "index",
@@ -63,7 +68,8 @@ export default {
 		}
 	},
 	components: {
-		MainSidebar,
+		SidebarLayout,
+		AppLinks
 	},
 	methods: {
 		pathList(type) {

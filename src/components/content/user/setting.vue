@@ -228,7 +228,8 @@ export default {
     },
     // 头像文件上传前的回调
     beforeAvatarUpload(file) {
-      const correctFormat = (file.type === 'image/jpeg' || file.type === 'image/png');
+      // const correctFormat = (file.type === 'image/jpeg' || file.type === 'image/png');
+      const correctFormat = /^image\//.test(file.type);
       const isLt2M = file.size / 1024 / 1024 < 2;
       if (!correctFormat) {
         this.$notify.error({

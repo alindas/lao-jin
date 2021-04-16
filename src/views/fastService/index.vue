@@ -52,7 +52,11 @@
             <el-button plain size='small' @click="reportRequest">提 交</el-button>
           </el-dialog>
 				</div>
-				<MainSidebar/>
+				<SidebarLayout fixed-distance="40%">
+					<template v-slot:common>
+						<AppLinks />
+					</template>
+				</SidebarLayout>
 			</div>
 		</section>
 	</div>
@@ -60,7 +64,8 @@
 </template>
 
 <script>
-import MainSidebar from '@/components/sidebar/mainSidebar';
+import SidebarLayout from '@/components/sidebar/SidebarLayout';
+import AppLinks from '@/components/sidebar/appLinks';
 import {reportMess, getLightDemand, confirmLightDemand} from '@/axios/request';
 import isLogin from '@/utils/loginJudge';
 import getFormateDate from '@/utils/dataFormate';
@@ -87,7 +92,8 @@ export default {
 	watch: {
 	},
 	components: {
-		MainSidebar,
+		SidebarLayout,
+    AppLinks
 	},
 	methods: {
     closeReportDialog() {

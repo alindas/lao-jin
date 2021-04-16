@@ -11,7 +11,10 @@
             <div class="message-w reserve" v-if="contentBody[item].name == loginedAcc">
               <div class="avatar"><a href="#"><img :src="avatarSelf" alt=""></a></div>
               <div class="message-content reserve">
-                <div class="message-text sender">{{contentBody[item].text}}</div>
+                <div class="message-pic sender" v-if="contentBody[item].url" @click="enlarge(contentBody[item].url)">
+                  <img :src="seePicUrl(contentBody[item].url)" alt="">
+                </div>
+                <div class="message-text sender" v-else>{{contentBody[item].text}}</div>
                 <el-popover placement="bottom" width="80" class="message-status">
                   <button class="more" @click="removeMessage(item)">&nbsp;删除</button>
                   <i class="el-icon-more" slot="reference"></i>
@@ -21,7 +24,10 @@
             <div class="message-w" v-else>
               <div class="avatar"><a href="#"><img :src="avatarB" alt=""></a></div>
               <div class="message-content">
-                <div class="message-text receiver">{{contentBody[item].text}}</div>
+                <div class="message-pic receiver" v-if="contentBody[item].url" @click="enlarge(contentBody[item].url)">
+                  <img :src="seePicUrl(contentBody[item].url)" alt="">
+                </div>
+                <div class="message-text receiver" v-else>{{contentBody[item].text}}</div>
                 <el-popover placement="bottom" width="80" class="message-status">
                   <button class="more" @click="removeMessage(item)">&nbsp;删除</button>
                   <button class="more">&nbsp;举报</button>
@@ -34,8 +40,15 @@
       </div>
       <div class="inputBox">
         <ul class="toolBar">
-          <li class="toolBar-item"><i class="el-icon-help"></i></li>
-          <li class="toolBar-item"><i class="el-icon-picture"></i></li>
+          <li class="toolBar-item" @click="emojiPicker = !emojiPicker">
+            <icon name="emoji" scale="5" class="chatavg"></icon>
+          </li>
+          <li class="toolBar-item" @click="sendPic">
+            <icon name="picture" scale="5" class="chatavg"></icon>
+          </li>
+          <div class="emojiPicker" v-show="emojiPicker == true">
+            <VEmojiPicker @select="selectEmoji" />
+          </div>
         </ul>
         <label for="input-content" class="input">
           <textarea class="input-content" 
@@ -45,13 +58,16 @@
         </label>
         <div class="footer">
           <div class="tip">Ctrl or ⌘ + Enter</div>
-          <el-button type="primary" size="small" @click="sendMessage">发送</el-button>
+          <el-button type="primary" size="small" @click="sendMessage()">发送</el-button>
         </div>
       </div>
     </div>
     <div class="chat-box" v-else>
       <img src="@/assets/message2.png" alt="" class="chat-box-bgc">
     </div>
+    <el-dialog :visible.sync="seeSendPic">
+      <img width="100%" :src="seePicUrl(picUrl)" alt="">
+    </el-dialog>
   </div>
   
 </template>
@@ -81,16 +97,22 @@ export default {
       return localStorage.getItem('account');
     },
     avatarSelf() {
-      return 'data:'+this.$store.state.account.avatar.minetype+';base64,'+this.$store.state.account.avatar.base64;
+      return `data:${this.$store.state.account.avatar.minetype};base64,${this.$store.state.account.avatar.base64}`;
     },
     avatarB() {
-      return 'data:'+this.currentSessionResources.avatar.minetype+';base64,'+this.currentSessionResources.avatar.base64;
+      return `data:${this.currentSessionResources.avatar.minetype};base64,${this.currentSessionResources.avatar.base64}`;
+    },
+    contentBodyLength() {
+      return Object.keys(this.contentBody).length; 
     }
   },
   data() {
     return {
       contentBody: {},
       inputMessage: '',
+      seeSendPic: false,
+      emojiPicker: false,
+      picUrl: '',
       sendContentBody: null
     }
   },
@@ -101,23 +123,37 @@ export default {
     sendStatus() {
       this.contentBody[this.sendStatus.key] = this.sendStatus.content;
       this.$forceUpdate();
+      this.showLatestChat();
     },
     '$store.state.notice.chat': function(newVal) {
-      // for(let item of newVal) {
-      //   this.contentBody[item.key] = item.content;
-      //   console.log(this.contentBody[item.key]);
-      // }
-      console.log(newVal);
       this.contentBody[newVal.key] = newVal.content;
       this.$forceUpdate();
-    },
+    }
   },
   methods: {
+    seePicUrl(url) {
+      return typeof url === 'object' ? `data:${url.mimetype};base64,${url.base64}` : url;
+    },
+    enlarge(url) {
+      this.seeSendPic = true;
+      this.picUrl = url;
+    },
     requestData(key) {
       getChatMessageContent({key: key})
       .then(res => {
         this.contentBody = res.data[0];
       })
+    },
+    selectEmoji(emoji) {
+      let $textarea = document.querySelector('.input-content');
+      let startPos = $textarea.selectionStart;
+      let endPos = $textarea.selectionEnd;
+      let resultText = $textarea.value.substring(0, startPos) + emoji.data + $textarea.value.substring(endPos);
+      $textarea.value = resultText;
+      $textarea.focus();
+      $textarea.selectionStart = startPos + emoji.data.length;
+      $textarea.selectionEnd = startPos + emoji.data.length;
+      this.inputMessage = resultText;
     },
     // Ctrl or ⌘ + Enter 发送
     handleEnterKey(event) {
@@ -151,17 +187,31 @@ export default {
       });
     },
     sendMessage() {
+      if(this.inputMessage === '') {
+        return;
+      }
+      this.emojiPicker = false;
       let date = getFormateDate('yyyy-MM-dd hh:mm:ss');
       let time = new Date().getTime();
       let params = {
-        date: date,
+        date,
         value: this.inputMessage,
-        time: time,
+        time,
         contentKey: this.currentMessageKey
       }
       this.$emit('SendMess', params);
       this.inputMessage = '';
-      this.showLatestChat();
+    },
+    sendPic() {
+      let date = getFormateDate('yyyy-MM-dd hh:mm:ss');
+      let time = new Date().getTime();
+      let params = {
+        date,
+        value: '[图片]',
+        time,
+        contentKey: this.currentMessageKey
+      }
+      this.$emit('SendPic', params);
     },
     removeMessage(key) {
       this.$confirm('是否删除该条消息?', '删除消息', {
@@ -187,7 +237,9 @@ export default {
     showLatestChat() {
       let ele = document.querySelector('.messageBox');
       if(ele) {
-        ele.scrollTop = ele.scrollHeight - ele.clientHeight;
+        this.$nextTick(() => {
+          ele.scrollTop = ele.scrollHeight - ele.clientHeight;
+        })
       }
     },
     // 会话时间线
@@ -202,12 +254,6 @@ export default {
   },
   created() {
     this.load();
-  },
-  mounted() {
-
-  },
-  updated() {
-    this.showLatestChat();
   }
 }
 

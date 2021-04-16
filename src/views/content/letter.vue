@@ -69,11 +69,22 @@
               </div>
             </div>
             <div class="chatBox">
+              <el-upload
+              action="http://localhost:8848/users/chatSendPic"
+              name="chatPic"
+              class="chatPicInput"
+              :data="chatContent"
+              :show-file-list="false"
+              :on-success="sendPicSuccess"
+              :before-upload="confirmChatPic">
+              <i class="chatPicInput" ref="sendPicBtn"></i>
+              </el-upload>
               <Chat v-if="init" 
                 :current-message-key="currentMessageKey" 
                 :current-session-resources="receiver"
                 :sendStatus="sendStatus" 
                 @SendMess="sendMessage(arguments)"
+                @SendPic="sendPic"
                 @DeleteMess="deleteMess"/>
             </div>
           </div>
@@ -135,6 +146,7 @@ export default {
       MessageListStatus: {},
       SearchUserList: {}, // 储存用户搜索结果集
       searchCD: null, // 用户搜索框防抖
+      chatContent: null // 发送图片信息更新载体
     }
   },
   watch: {
@@ -205,6 +217,66 @@ export default {
         };
       })
       
+    },
+    confirmChatPic(file) {
+      // const correctFormat = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg');
+      const correctFormat = /^image\//.test(file.type);
+      const isLt1M = file.size / 1024 / 1024 < 1;
+      if (!correctFormat) {
+        this.$message.warning('图片仅支持 JPG JPEG PNG 格式!');
+      }
+      if (!isLt1M) {
+        this.$message.warning('图片大小不能超过 1MB!');
+      }
+      return correctFormat && isLt1M;
+    },
+    // chat 发送图片
+    sendPic(data) {
+      let preTime = this.MessageListStatus[this.current];
+      let timeline = true;
+      if(preTime && data.time - preTime < 300000) {
+        timeline = false;
+      }
+      this.MessageListStatus[this.current] = data.time;
+      // 包装发送数据
+      let content = {
+        "name":  this.loginedAcc,
+        "text": data.value,
+        "timeLine": timeline,
+        "read": false
+      };
+      this.chatContent = {
+        key: this.current,
+        receiver: this.receiver.account,
+        contentKey: data.contentKey,
+        sendDate: data.date,
+        content: JSON.stringify(content),
+        latestTime: data.date.substr(5,5),
+        latestContent: data.value
+      };
+      this.$refs.sendPicBtn.click();
+    },
+    // 头像文件成功上传的回调
+    sendPicSuccess(res, file) {
+      if(res.message == 'success') {
+        /** 更新视图 */
+        for(let item of this.MessageList) {
+          if(item._id === this.current) {
+            item.latestTime = this.chatContent.latestTime;
+            item.latestContent = this.chatContent.latestContent;
+            break;
+          }
+        }
+        const content = JSON.parse(this.chatContent.content);
+        content.url = URL.createObjectURL(file.raw);
+        this.sendStatus = {
+          key: this.chatContent.sendDate,
+          content
+        };
+      }
+      else {
+        this.$message.error('发送失败！');
+      }
     },
     // 删除chat 聊天框的信息记录
     deleteMess(key) {

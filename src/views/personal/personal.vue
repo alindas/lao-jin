@@ -77,7 +77,7 @@
         >
         <h3 slot="title" class="reChargeHeader">
           <span class="title">余额充值</span>
-          <span>余额</span>
+          <span>余额: {{showInfo.account}}</span>
         </h3>
         <div class="reCharge-content">
           <ul class="reCharge-selectlist">

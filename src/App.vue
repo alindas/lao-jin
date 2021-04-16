@@ -67,6 +67,13 @@ export default {
               console.log(event.data);
             }
             // 监听服务端自定义事件，并作出相应处理
+            // 用户账号信息更新
+            this.sourse.addEventListener(`${localStorage.getItem('account')}-updateWallet`, event => {
+              this.$store.commit('updateWallet', {
+                data: parseFloat(event.data)
+              })
+              console.log( event.type + ' 事件已响应，数据'+ event.data);
+            })
             // 私信会话
             this.sourse.addEventListener(`${localStorage.getItem('account')}-chat`, event => {
               this.$store.commit('addChatNotice', {

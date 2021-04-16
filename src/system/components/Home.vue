@@ -254,7 +254,7 @@ export default {
       if(hidden == false) {
         clearInterval(this.alarmLock);
         // 超过一分钟回退
-        if(this.aliveTime >= 2) {
+        if(this.aliveTime >= 10) {
           clearCookie('manage');
           this.$router.push({path: '/system'})
         }else {

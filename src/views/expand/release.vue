@@ -256,6 +256,7 @@ export default {
     },
     // 保存为草稿
     saveDrafts() {
+      this.releaseForm['releaseDate'] = getFormateDate('Y-M-d h:m:s');
       let upsetData = {
         key: localStorage.getItem('drafts'),
         data: this.releaseForm,
@@ -295,7 +296,8 @@ export default {
           single: 1,
           singleKey: this.$route.query.id })
         .then(res => {
-          let init = res.data[0][this.$route.query.id];
+          console.log(res);
+          let init = res.data[this.$route.query.id];
           for (let i in init.sort) {
             init.sort[i] = init.sort[i].name;
           }

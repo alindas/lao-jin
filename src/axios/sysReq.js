@@ -10,6 +10,8 @@ let reqLoginedUserSkip = data => req.post('reqLoginedUserSkip', data);
 
 let reqExamineInfoSkip = data => req.post('reqExamineInfoSkip', data);
 
+let ApprovalMessage = data => req.post('approvalMessage', data);
+
 
 export {
   systemLogin, // 后台系统登录请求
@@ -17,4 +19,6 @@ export {
   reqLoginedUserSkip, // 分段请求注册用户
 
   reqExamineInfoSkip, // 分段请求审核信息
+
+  ApprovalMessage, // 审批信息
 }

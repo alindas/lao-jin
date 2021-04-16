@@ -1,15 +1,25 @@
 <template>
   <div class="infoManage">
-    <ListTable :table-title="title" :select-keys="selectKeys" tabTitle="信息审核" 
-    :expand="true" :table-title-expand="expandTitle" :data-table="infoList" :actions="actions"
-    @pass="pass" @notPass="notPass" :dataTableLength="dataTableLength"
-    @goPage="newInfoList" @searchData="setSearch"/>
+    <ListTable 
+    :table-title="title" 
+    :select-keys="selectKeys"
+    tabTitle="信息审核" 
+    :expand="true"
+    :table-title-expand="expandTitle" 
+    :data-table="infoList" 
+    :actions="actions"
+    @pass="pass" 
+    @notPass="notPass" 
+    :dataTableLength="dataTableLength"
+    @goPage="newInfoList"
+    @searchData="setSearch"
+    @selectData="setSelect"/>
   </div>
 </template>
 
 <script>
 import ListTable from '@/components/common/ShowListData';
-import { reqExamineInfoSkip } from '@/axios/request';
+import { reqExamineInfoSkip, ApprovalMessage } from '@/axios/request';
 
 
 export default {
@@ -44,9 +54,22 @@ export default {
       },{
         prop: 'content',
         label: '内容'
-      },],
-      selectKeys: [],
+      },{
+        prop: 'report',
+        label: '举报信息'
+      }],
+      selectKeys: [
+        {
+          value: 'check',
+          label: '新发布审查'
+        },
+        {
+          value: 'report',
+          label: '用户举报审查'
+        }
+      ],
       searchKey: null,
+      selectKey: null,
       dataTableLength: 0,
       infoList: [
         {
@@ -77,7 +100,7 @@ export default {
   },
   methods: {
     load() {
-      reqExamineInfoSkip({skip: 0, pageSize: 10, init: true, key: this.searchKey})
+      reqExamineInfoSkip({skip: 0, pageSize: 10, init: true, searchKey: this.searchKey, selectKey: this.selectKey})
       .then(res => {
         this.infoList = this.formatInfoList(res.data.infoList);
         this.dataTableLength = res.data.infoListTotal;
@@ -85,6 +108,10 @@ export default {
     },
     setSearch(val) {
       this.searchKey = val;
+      this.load();
+    },
+    setSelect(val) {
+      this.selectKey = val;
       this.load();
     },
     newInfoList(currentP) {
@@ -111,15 +138,84 @@ export default {
         newItem.author = item.author;
         newItem.author_link = item.author_link;
         newItem.read_count = item.read_count;
+        newItem.check = item.check;
+        newItem.report = item.report;
         newArrayObj[index] = newItem;
       })
       return newArrayObj;
     },
     pass(index) {
-      console.log(index);
+      let resultN;
+      if(index.report.length) {
+        resultN = ApprovalMessage({
+          type: 'report',
+          result: true,
+          id: index._id,
+          author: index.author_link
+        })
+      }
+      else {
+        resultN = ApprovalMessage({
+          type: 'check',
+          result: true,
+          id: index._id,
+          author: index.author_link
+        })
+      }
+      resultN
+      .then(res => {
+        if(res.data.message == 'success') {
+          this.$message({
+            type: 'success',
+            message: '处理成功'
+          });
+          for(let i in this.infoList) {
+            if(this.infoList[i]._id == index._id) {
+              this.infoList.splice(i, 1);
+            }
+          }
+        }
+        else {
+          this.$message.error('处理失败');
+        }
+      })
     },
     notPass(index) {
-      console.log(index);
+      let resultN;
+      if(index.report.length) {
+        resultN = ApprovalMessage({
+          type: 'report',
+          result: false,
+          id: index._id,
+          author: index.author_link
+        })
+      }
+      else {
+        resultN = ApprovalMessage({
+          type: 'check',
+          result: false,
+          id: index._id,
+          author: index.author_link
+        })
+      }
+      resultN
+      .then(res => {
+        if(res.message == 'success') {
+          this.$message({
+            type: 'success',
+            message: '处理成功'
+          });
+          for(let i in this.infoList) {
+            if(this.infoList[i]._id == index._id) {
+              this.infoList.splice(i, 1);
+            }
+          }
+        }
+        else {
+          this.$message.error('处理失败');
+        }
+      })
+    
     }
   },
   created() {

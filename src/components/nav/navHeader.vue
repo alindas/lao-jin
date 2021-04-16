@@ -146,7 +146,7 @@
                 <span>查看全部通知</span>
               </div>
             </div>
-            <i class="el-icon-message-solid" slot="reference" @click="seeSysNotice(0)"><el-badge v-show="messageNum != 0" :value="messageNum" :max="99"/></i>
+            <i class="el-icon-message-solid" slot="reference" @click="seeSysNotice(messageType)"><el-badge v-show="messageNum != 0" :value="messageNum" :max="99"/></i>
           </el-popover>
         </div>
         <el-dialog :visible.sync="loginDialogVisible" width="25%" :modal-append-to-body="true"
@@ -223,7 +223,7 @@
                 <el-input v-model="releaseForm.content"></el-input>
               </el-form-item>
               <el-form-item label="报酬" style="margin-bottom: 22px">
-                <el-input-number v-model="releaseForm.reward" :min="1" :max="10" label="描述文字"></el-input-number>
+                <el-input-number v-model="releaseForm.reward" :min="0.1" :max="999" label="描述文字"></el-input-number>
               </el-form-item>
               <el-form-item label="高校" style="margin-bottom: 22px" prop="educ">
                 <el-select v-model="releaseForm.university" placeholder="请选择">
@@ -829,7 +829,7 @@ export default {
       this.seeSysNoticeQ = true;
       getSysMessage({account: localStorage.getItem('activities'), type })
         .then(res => {
-          this.sysMessageList[type] = res.data;
+          this.sysMessageList[type] = res.data.reverse();
           this.messageNotice[type] = false;
           this.$store.commit('updateSysNotice', type);
           this.seeSysNoticeQ = false;

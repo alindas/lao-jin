@@ -121,6 +121,33 @@
       box-sizing: border-box;
       white-space: pre-wrap;
     }
+    .message-pic {
+      position: relative;
+      margin: 0 8px;
+      padding: 5px 5px;
+      border-radius: 8px;
+      max-width: 110px;
+      min-height: 40px;
+      box-sizing: border-box;
+      font-size: 20px;
+      color: rgba(0, 0, 0, 1);
+      img {
+        width: 100%;
+        vertical-align: middle;
+        object-fit: contain;
+      }
+      &:hover {
+        cursor: pointer;
+        opacity: .7;
+        &::before {
+          content: "🔍";
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
     .message-status {
       opacity: 0;
     }
@@ -138,6 +165,7 @@
   max-height: 250px;
   min-width: 180px;
   .toolBar {
+    position: relative;
     margin: 0 14px;
     padding: 11px 0 0;
     box-sizing: border-box;
@@ -151,6 +179,18 @@
       &:nth-child(n+2) {
         margin-left: 10px;
       }
+      .chatavg {
+        width: 25px;
+        height: 25px;
+      }
+    }
+    .emojiPicker {
+      position: absolute;
+      bottom: 110%;
+      left: 0;
+      width: 344px;
+      height: 233px;
+      overflow: hidden;
     }
   }
   .input {

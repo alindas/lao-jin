@@ -6,56 +6,61 @@
         <span class="count">{{count}}</span>
       </h4>
     </div>
-		<transition-group>
-			<div class="list" v-for="list in showList" :key="list.key ? list.key : list.account">
-				<div v-if="listContentType == 0">
-					<h2>
-            <router-link to="/post" v-if="status == 'release'" target="_blank">{{list.title}}</router-link>
-            <router-link :to="'/others/release?id=' + list.key" 
-             v-if="status == 'drafts'" target="_blank">{{list.title}}</router-link>
-					</h2>
-					<div class="content">
-						<div class="actions" v-if="status == 'release'">
-							<span>
-								<button><i class="lj-icon-dianzanqian"></i> {{list.voteup_count}}</button>
-							</span>
-							<span>
-								<a href="/post#comment" target="_blank"><i class="el-icon-s-comment">&nbsp;{{list.comment_count}} 条评论</i></a> 
-							</span>
-							<span>
-								<i class="el-icon-share">&nbsp;分享</i>
-							</span>
-							<span>
-                <i class="el-icon-star-on">&nbsp;收藏</i>
-							</span>
-						</div>
-            <div class="actions" v-if="status == 'drafts'">
-							<span>
-								<i class="el-icon-time">&nbsp;{{list.releaseDate}}</i>
-							</span>
-							<span @click="deleteDrafts(list.key)">
-								<i class="el-icon-delete">&nbsp;删除</i>
-							</span>
-						</div>
-					</div>
-				</div>
-        <div v-if="listContentType == 1" class="tagsAndUsers">
-          <router-link :to="'/users/' + list._id" target="_blank" class="avatar-link">
-						<img :src="Avatar(list.avatar)" alt="">
-					</router-link>
-					<div class="meta">
-						<h4><router-link :to="'/users/' + list._id " target="_blank">{{list.name}}</router-link></h4>
-						<span>{{list.introduction}}</span>
-					</div>
-					<el-button type="primary" size="small" :plain="!resetFollow[list._id]"
-						@click="followUser(list._id, list.name, list.avatar)" v-if="status = 'follows'"
-					>{{resetFollow[list._id] ? '关注' : '取消关注'}}</el-button>
+    <div class="list-wrap">
+      <transition-group tag="div">
+        <div class="list" v-for="list in showList" :key="list.key ? list.key : list.account">
+          <div v-if="listContentType == 0">
+            <h2>
+              <router-link :to="'/post/' + list.key" v-if="status == 'release'" target="_blank">{{list.title}}</router-link>
+              <router-link :to="'/others/release?id=' + list.key" 
+              v-if="status == 'drafts'" target="_blank">{{list.title}}</router-link>
+            </h2>
+            <div class="content">
+              <div class="actions" v-if="status == 'release'">
+                <span>
+                  <a :href="'/post/' + list.key + '#comment'" target="_blank"><i class="el-icon-s-comment">&nbsp;查看热评</i></a> 
+                </span>
+                <span>
+                  <i class="el-icon-share">&nbsp;分享</i>
+                </span>
+                <span>
+                  <i class="el-icon-star-on">&nbsp;收藏</i>
+                </span>
+              </div>
+              <div class="actions" v-if="status == 'drafts'">
+                <span>
+                  <i class="el-icon-time">&nbsp;{{list.releaseDate}}</i>
+                </span>
+                <span @click="deleteDrafts(list.key)">
+                  <i class="el-icon-delete">&nbsp;删除</i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div v-else-if="listContentType == 1" class="tagsAndUsers">
+            <router-link :to="'/users/' + list._id" target="_blank" class="avatar-link">
+              <img :src="Avatar(list.avatar)" alt="">
+            </router-link>
+            <div class="meta">
+              <h4><router-link :to="'/users/' + list._id " target="_blank">{{list.name}}</router-link></h4>
+              <span>{{list.introduction}}</span>
+            </div>
+            <el-button type="primary" size="small" :plain="!resetFollow[list._id]"
+              @click="followUser(list._id, list.name, list.avatar)" v-if="status = 'follows'"
+            >{{resetFollow[list._id] ? '关注' : '取消关注'}}</el-button>
+          </div>
+          <div v-else-if="listContentType == 2">
+            <h2>
+              <router-link :to="list.link ? list.link : '#'">{{list.desc}}</router-link>
+            </h2>
+          </div>
         </div>
-			</div>
-      <div class="nothing" key="nothing" v-if="!count">
-        <span>还没有内容</span>
-      </div>
-		</transition-group>
+        <div class="nothing" key="nothing" v-if="!count">
+          <span>还没有内容</span>
+        </div>
+      </transition-group>
+    </div>
+		
 	</div>
 </template>
 
@@ -81,13 +86,15 @@ export default {
   },
   computed: {
     count() {
-      return Object.keys(this.showList).length;
+      return Array.isArray(this.showList) ? this.showList.length : Object.keys(this.showList).length;
     },
     listContentType() {
-      if(this.status == 'activities' || this.status == 'release' || this.status == 'drafts') {
+      if(this.status == 'release' || this.status == 'drafts') {
         return 0;
       }else if(this.status == 'follows' || this.status == 'fans') {
         return 1;
+      }else if(this.status == 'activities') {
+        return 2;
       }else {
         return -1;
       }
@@ -184,8 +191,8 @@ export default {
       }
       else if(this.status == 'activities') {
         this.showListTitle = '我的动态';
-        params.type = 'drafts';
-        params.key = this.$store.state.account.drafts;
+        params.type = 'activities';
+        params.key = this.$store.state.account.activities;
       }
       else {
         this.showListTitle = '我的';
@@ -195,7 +202,7 @@ export default {
        */
       getCenterMessage(params)
       .then(res => {
-        this.showList = res.data[0];
+        this.showList = res.data;
       })
       .catch(err => {
         console.log(err);
@@ -238,6 +245,14 @@ export default {
     color: $light-gray;
     font-size: 16px;
     text-align: center;
+  }
+}
+
+.list-wrap {
+  height: 100%;
+  overflow-y: hidden;
+  &:hover {
+    overflow-y: auto;
   }
 }
 @include animate();
