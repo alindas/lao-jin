@@ -31,7 +31,7 @@
 							</span>
 							<span>
 								<el-popover placement="bottom" width="80">
-									<button class="more" @click="report = true, reportID = list._id">&nbsp;举报</button>
+									<button class="more" @click="report = true, reportMess = list">&nbsp;举报</button>
 									<i class="el-icon-more" slot="reference"></i>
 								</el-popover>
 							</span>
@@ -131,9 +131,10 @@ export default {
 	data () {
 		return {
 			report: false, 
-			reportID: -1,
+			reportMess: null,
 			reportList: [], // 举报违规列表
 			lists: [],
+			reportedList: [],
 			isfollowUserList: {},
 			isfollowTagsList: {}
 		}
@@ -277,18 +278,37 @@ export default {
 		},
 		reportRequest() {
 			if(!isLogined.call(this)) return;
+			let user = localStorage.getItem('account');
+			for(let item of this.reportedList) {
+				if(item == this.reportMess._id) {
+					this.report = false;
+					this.$message.warning('你已经提交过举报,请耐心等待结果');
+					return;
+				}
+			}
+			for(let item of this.reportMess.report) {
+				if(item.reportId == user) {
+					this.report = false;
+					this.$message.warning('你已经提交过举报,请耐心等待结果');
+					return;
+				}
+			}
 			reportMess({
-				user: localStorage.getItem('account'),
-				id: this.reportID,
+				user,
+				id: this.reportMess._id,
 				list: this.reportList
 			})
 			.then(res => {
 				this.report = false;
-				console.log(this.reportID);
+				this.reportedList.push(this.reportMess._id);
+				this.$message({
+					type: 'success',
+					message: '你的举报已成功提交,感谢每位热情的捞金小伙伴'
+				})
 			})
 		},
 		closeReportDialog() {
-			this.reportID = -1;
+			this.reportMess = null;
 			this.reportList = [];
 		}
 	},

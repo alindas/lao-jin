@@ -142,6 +142,9 @@ export default {
       getChatMessageContent({key: key})
       .then(res => {
         this.contentBody = res.data[0];
+        this.$nextTick(() => {
+          this.showLatestChat();
+        })
       })
     },
     selectEmoji(emoji) {

@@ -83,7 +83,7 @@ export default {
             })
             // 系统通知, 类型0
             this.sourse.addEventListener(`${localStorage.getItem('account')}-sys-0`, event => {
-              this.$store.commit('addSysNotice', {
+              this.$store.state.account.Notice[0] && this.$store.commit('addSysNotice', {
                 type: 0,
                 data: event.data
               });
@@ -91,7 +91,7 @@ export default {
             })
             // 系统通知, 类型1
             this.sourse.addEventListener(`${localStorage.getItem('account')}-sys-1`, event => {
-              this.$store.commit('addSysNotice', {
+              this.$store.state.account.Notice[1] && this.$store.commit('addSysNotice', {
                 type: 1,
                 data: event.data
               })
@@ -100,7 +100,7 @@ export default {
             });
             // 系统通知, 类型2
             this.sourse.addEventListener(`${localStorage.getItem('account')}-sys-2`, event => {
-              this.$store.commit('addSysNotice', {
+              this.$store.state.account.Notice[0] && this.$store.commit('addSysNotice', {
                 type: 2,
                 data: event.data
               });

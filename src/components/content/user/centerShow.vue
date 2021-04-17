@@ -13,7 +13,7 @@
             <h2>
               <router-link :to="'/post/' + list.key" v-if="status == 'release'" target="_blank">{{list.title}}</router-link>
               <router-link :to="'/others/release?id=' + list.key" 
-              v-if="status == 'drafts'" target="_blank">{{list.title}}</router-link>
+              v-if="status == 'drafts'" target="_blank">{{list.title ? list.title : '无标题'}}</router-link>
             </h2>
             <div class="content">
               <div class="actions" v-if="status == 'release'">

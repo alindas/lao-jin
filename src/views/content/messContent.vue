@@ -472,6 +472,10 @@ export default {
       showPartTimeWork(params)
       .then(res => {
         if(res.data.message == 'success') {
+          if(!res.data.mainContent.check) {
+            this.$message.warning('该兼职信息尚未通过系统审核');
+            this.$router.push({path: '/'});
+          }
           this.mainData = JSON.parse(JSON.stringify(res.data.mainContent));
           this.commentData = res.data.comment;
           this.userLikeList = res.data.likeHis;

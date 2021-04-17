@@ -47,7 +47,7 @@
                 <i class="el-icon-user-solid"></i>
                 <span>我的主页</span>
               </div>
-              <div @click="JumpPage('/personal/settings/')">
+              <div @click="JumpPage('settings/profile')">
                 <i class="el-icon-s-tools"></i>
                 <span>设置</span>
               </div>
@@ -129,21 +129,19 @@
             <div class="message-middle" v-else>
               <router-link class="list-item" v-for="(item,index) in sysMessageList[messageType]" :key="index"
                 :to="item.link" @click.native="outPopover" :title="item.desc">
-                <div class="list-item-content">
-                  {{item.desc}}
-                </div>
+                <div class="list-item-content" v-html="item.desc"></div>
               </router-link>
             </div>
             <div class="message-middle-text" v-if="sysMessageList[messageType].length == 0">
               <span>还没有消息</span>
             </div>
             <div class="message-below">
-              <div>
+              <div @click="JumpPage('settings/system')">
                 <i class="el-icon-s-tools"></i>
                 <span>设置</span>
               </div>
-              <div>
-                <span>查看全部通知</span>
+              <div @click="OneClickRead">
+                <span>一键已读</span>
               </div>
             </div>
             <i class="el-icon-message-solid" slot="reference" @click="seeSysNotice(messageType)"><el-badge v-show="messageNum != 0" :value="messageNum" :max="99"/></i>
@@ -370,7 +368,9 @@ export default {
       if(this.$route.path.includes('/letters')) {
         return;
       }
-      this.letterNum += 1;
+      else if(this.$store.state.account.Notice[2]) {
+        this.letterNum += 1;
+      }
     },
     systemNotice: {
       handler: function(newVal, oldVal) {
@@ -399,6 +399,10 @@ export default {
   methods: {
     preventDefault() {
       event.preventDefault();
+    }, 
+    OneClickRead() {
+      this.messageNotice = [false, false, false];
+      this.messageNum = 0;
     },
     openLightDemandDialog() {
       event.stopPropagation();
@@ -696,7 +700,7 @@ export default {
       loginOut({account: localStorage.getItem('account') })
       .then(res => {
         if(res.data.message == 'success') {
-          cookieFun.clearCookie('token');
+          cookieFun.clearCookie('token', 'localhost', '/');
           localStorage.removeItem('baseMess');
           localStorage.removeItem('account');
           localStorage.removeItem('release');
@@ -770,7 +774,7 @@ export default {
       // 匹配设置
       if(arguments[0].includes('settings')) {
         let account = this.$store.state.account._id;
-        this.$router.push('/personal/' + account + '/settings/profile');
+        this.$router.push(`/personal/${account}/${arguments[0]}`);
       }
       // 匹配个人主页
       else if(arguments[0].includes('personal')) {

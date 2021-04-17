@@ -30,7 +30,14 @@
             <ul class="expand-content">
               <li v-for="item in tableTitleExpand" :key="item.prop">
                 <span class="label">{{item.label}}</span>
-                <div class="expand-data">{{scope.row[item.prop]}}</div>
+                <div class="expand-data" v-if="item.label == '举报信息'">
+                  <p v-for="item in scope.row[item.prop]" :key="item.reportId">
+                    {{item.reportId}} :  {{item.list.join(' | ')}}
+                  </p>
+                </div>
+                <div class="expand-data" v-else>
+                  {{scope.row[item.prop]}}
+                </div>
               </li>
             </ul>
           </template>
@@ -131,7 +138,7 @@ export default {
   },
   methods: {
     setSelectKey() {
-      this.$emit('selectData', this.selectKeys);
+      this.$emit('selectData', this.selectKey);
     },
     searchData() {
       this.$emit('searchData', this.searchKey);
@@ -216,6 +223,7 @@ export default {
           display: inline-block;
           width: 60px;
           color: #99a9bf;
+          vertical-align: top;
         }
         .expand-data {
           display: inline-block;

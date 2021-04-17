@@ -35,8 +35,9 @@
     <section class="clear">
       <div class="container">
         <div class="drafts">
+          <div class="empty-item" v-if="Object.keys(draftsList).length == 0">草稿箱为空</div>
           <div class="item" v-for="item in draftsList" :key="item.key">
-            <router-link :to="'/others/release?id=' + item.key" class="title">{{item.title}}</router-link>  
+            <router-link :to="'/others/release?id=' + item.key" class="title">{{item.title ? item.title : '无标题'}}</router-link>  
             <div class="meta">
               <el-tooltip effect="dark" :content="item.releaseDate" placement="bottom">
                 <div class="time">{{writeTime(item.releaseTime)}}</div>
@@ -80,7 +81,7 @@ export default {
       })
       .then(() => {
         deleteCenterMessage({
-          key: this.$store.state.account.drafts,
+          account: localStorage.getItem('drafts'),
           deleteKey: key,
           type: "drafts" })
         .then(res => {
@@ -88,7 +89,9 @@ export default {
             this.$message({
               message: '删除成功',
               type: 'success'
-            })
+            });
+            delete this.draftsList[key];
+            this.$forceUpdate();
           }
           else {
             this.$message.error('删除失败，请稍后重试');
@@ -118,7 +121,8 @@ export default {
     load() {
       getCenterMessage({type: 'drafts', key: localStorage.getItem('drafts')})
         .then(res => {
-          this.draftsList = res.data[0];
+          console.log(res);
+          this.draftsList = res.data;
         })
         .catch(err => {
           console.log(err);

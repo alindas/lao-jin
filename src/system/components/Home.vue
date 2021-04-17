@@ -183,8 +183,7 @@ export default {
       this.sidebarHover = false;
     },
     loginout() {
-      console.log('loginout');
-      clearCookie('manage');
+      clearCookie('manage', 'localhost', '/system');
       this.$router.push({path: '/system'});
     },
     // 关闭导航栏菜单标签
@@ -253,14 +252,15 @@ export default {
        */
       if(hidden == false) {
         clearInterval(this.alarmLock);
-        // 超过一分钟回退
-        if(this.aliveTime >= 10) {
-          clearCookie('manage');
+        // 超过五分钟无操作回退
+        if(this.aliveTime >= 20) {
+          clearCookie('manage', 'localhost', '/system');
           this.$router.push({path: '/system'})
         }else {
           this.aliveTime = 0;
         }
-      }else if(hidden == true) {
+      }
+      else if(hidden == true) {
         this.alarmLock = setInterval(() => this.aliveTime ++, 30000)
       }
     }

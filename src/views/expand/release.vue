@@ -239,7 +239,13 @@ export default {
           updateRelease({...upsetData, _id, avatar, name, release, drafts})
           .then(res => {
             if(res.data.message == 'success') {
-              window.location.href = `/post/${res.data.url}`;
+              this.$message({
+                type: 'success',
+                message: '兼职发布成功，请耐心等待系统进行审核^^'
+              })
+              setTimeout(() => {
+                 window.location.href = `/`;
+              }, 1000)
             }
             else {
               this.$message.error('服务器错误，稍后重试');
@@ -257,6 +263,7 @@ export default {
     // 保存为草稿
     saveDrafts() {
       this.releaseForm['releaseDate'] = getFormateDate('Y-M-d h:m:s');
+      this.releaseForm['releaseTime'] = new Date().getTime();
       let upsetData = {
         key: localStorage.getItem('drafts'),
         data: this.releaseForm,

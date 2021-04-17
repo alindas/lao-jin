@@ -10,7 +10,7 @@
     <section>
       <div class="container">
         <div class="main">
-          <div class="setting-view profile" v-if="view">
+          <div class="setting-view profile" v-if="view == 0">
             <h1>个人资料</h1>
             <ul class="settings-list">
               <li class="item">
@@ -81,7 +81,7 @@
               </li>
             </ul>
           </div>
-          <div class="setting-view account" v-else>
+          <div class="setting-view account" v-else-if="view == 1">
             <h1>账号设置</h1>
             <ul class="settings-list">
               <li class="item">
@@ -114,6 +114,56 @@
                 <span class="title">账号注销</span>
                 <div class="input-box" />
                 <div class="action-box"><el-button type="text">注销</el-button></div>
+              </li>
+            </ul>
+          </div>
+          <div class="setting-view system" v-else>
+            <h1>消息通知</h1>
+            <ul class="settings-list">
+              <li class="item">
+                <span class="title">系统消息</span>
+                <div class="input-box">
+                  <span class="content-box">建议保持开启以免错过重要内容通知</span> 
+                </div>
+                <div class="action-box">
+                  <el-switch
+                    style="display: block"
+                    v-model="userInfo.Notice[0]"
+                    active-color="#fAAf00"
+                    inactive-color="#bfbfbf"
+                    @change="updateNotice"
+                    >
+                  </el-switch>
+                </div>
+              </li>
+              <li class="item">
+                <span class="title">代办任务</span>
+                <div class="input-box"></div>
+                <div class="action-box">
+                  <el-switch
+                    style="display: block"
+                    v-model="userInfo.Notice[1]"
+                    active-color="#fAAf00"
+                    inactive-color="#bfbfbf"
+                    @change="updateNotice"
+                    >
+                  </el-switch>
+                </div>
+              </li>
+              <li class="item">
+                <span class="title">用户私信</span>
+                <div class="input-box"></div>
+                <div class="action-box">
+                  <el-switch
+                    style="display: block"
+                    v-model="userInfo.Notice[2]"
+                    active-color="#fAAf00"
+                    inactive-color="#bfbfbf"
+                    @change="updateNotice"
+                    >
+                  </el-switch>
+                </div>
+                
               </li>
             </ul>
           </div>
@@ -171,7 +221,7 @@ export default {
   data() {
     return {
       imageUrl: '',
-      view: true,
+      view: 0,
       actionBoxId: -1,
       resetDialogVisible: false,
       resetView: -1,
@@ -191,7 +241,8 @@ export default {
         forgetId: '',
         forgetVerifyCode: '',
         newPassword: '',
-      }
+      },
+      debounce: false, // 用户更新设置防抖标记
     }
   },
   computed: {
@@ -234,13 +285,15 @@ export default {
       if (!correctFormat) {
         this.$notify.error({
           title: '上传头像图片仅支持 JPG JPEG PNG 格式!',
-          showClose: false
+          showClose: false,
+          duration: 2000
         });
       }
       if (!isLt2M) {
         this.$notify.error({
           title: '上传头像图片大小不能超过 5MB!',
-          showClose: false
+          showClose: false,
+          duration: 2000
         });
       }
       return correctFormat && isLt2M;
@@ -266,15 +319,17 @@ export default {
         if(res.data.message == 'success') {
           this.$store.commit('updateAccountSingle',[value,this.userInfo[value]]);
           this.$notify.success({
-          title: '更新成功',
-          showClose: false
+            title: '更新成功',
+            showClose: false,
+            duration: 2000
           });
         }
         else {
           this.userInfo[value] = initialVal;
           this.$notify.error({
-          title: res.data.message,
-          showClose: false
+            title: res.data.message,
+            showClose: false,
+            duration: 2000
           });
         }
       })
@@ -285,6 +340,39 @@ export default {
           showClose: false
         });
       })
+    },
+    updateNotice() {
+      if(this.debounce) {
+        clearTimeout(this.debounce);
+        this.debounce = null;
+      }
+      this.debounce = setTimeout(() => {
+        updateSetting({ _id: this.userInfo._id, key: 'Notice', value: this.userInfo.Notice})
+        .then(res => {
+          if(res.data.message == 'success') {
+            this.$store.commit('updateAccountSingle',['Notice',this.userInfo.Notice]);
+            this.$notify.success({
+            title: '更新成功',
+            showClose: false,
+            duration: 2000
+            });
+          }
+          else {
+            this.$notify.error({
+            title: res.data.message,
+            showClose: false,
+            duration: 2000
+            });
+          }
+        })
+        .catch(err => {
+          this.$notify.error({
+            title: err,
+            showClose: false,
+            duration: 2000
+          });
+        })
+      }, 800)
     },
     cancel(id,value) {
       setTimeout(() => {
@@ -406,15 +494,35 @@ export default {
     this.subnav[2] = {
       name: '账号设置',
       path: '/personal/' + localStorage.getItem('account') + '/settings/account'
+    };
+    this.subnav[3] = {
+      name: '消息通知',
+      path: '/personal/' + localStorage.getItem('account') + '/settings/system'
     }
-    this.view = this.$route.path.includes('profile') ? true : false;
+    if(this.$route.path.includes('profile')) {
+      this.view = 0;
+    }
+    else if(this.$route.path.includes('account')) {
+      this.view = 1;
+    }
+    else if(this.$route.path.includes('system')) {
+      this.view = 2;
+    }
     this.subnav[0].path = '/personal/' + this.$store.state.account._id;
   },
   mounted() {
     
   },
   updated() {
-    this.view = this.$route.path.includes('profile') ? true : false;
+    if(this.$route.path.includes('profile')) {
+      this.view = 0;
+    }
+    else if(this.$route.path.includes('account')) {
+      this.view = 1;
+    }
+    else if(this.$route.path.includes('system')) {
+      this.view = 2;
+    }
   }
 }
 

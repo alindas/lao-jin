@@ -138,6 +138,8 @@ export default {
         newItem.author = item.author;
         newItem.author_link = item.author_link;
         newItem.read_count = item.read_count;
+        newItem.comment_content = item.comment_content;
+        newItem.comment_count = item.comment_count;
         newItem.check = item.check;
         newItem.report = item.report;
         newArrayObj[index] = newItem;
@@ -187,7 +189,9 @@ export default {
           type: 'report',
           result: false,
           id: index._id,
-          author: index.author_link
+          author: index.author_link,
+          comment_content: index.comment_content,
+          comment_count: index.comment_count
         })
       }
       else {
@@ -195,12 +199,14 @@ export default {
           type: 'check',
           result: false,
           id: index._id,
-          author: index.author_link
+          author: index.author_link,
+          comment_content: index.comment_content
+
         })
       }
       resultN
       .then(res => {
-        if(res.message == 'success') {
+        if(res.data.message == 'success') {
           this.$message({
             type: 'success',
             message: '处理成功'
