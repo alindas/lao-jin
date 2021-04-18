@@ -11,22 +11,11 @@
         <div class="list" v-for="list in showList" :key="list.key ? list.key : list.account">
           <div v-if="listContentType == 0">
             <h2>
-              <router-link :to="'/post/' + list.key" v-if="status == 'release'" target="_blank">{{list.title}}</router-link>
               <router-link :to="'/others/release?id=' + list.key" 
               v-if="status == 'drafts'" target="_blank">{{list.title ? list.title : '无标题'}}</router-link>
+              <router-link :to="'/post/' + list.key" v-else target="_blank">{{list.title}}</router-link>
             </h2>
             <div class="content">
-              <div class="actions" v-if="status == 'release'">
-                <span>
-                  <a :href="'/post/' + list.key + '#comment'" target="_blank"><i class="el-icon-s-comment">&nbsp;查看热评</i></a> 
-                </span>
-                <span>
-                  <i class="el-icon-share">&nbsp;分享</i>
-                </span>
-                <span>
-                  <i class="el-icon-star-on">&nbsp;收藏</i>
-                </span>
-              </div>
               <div class="actions" v-if="status == 'drafts'">
                 <span>
                   <i class="el-icon-time">&nbsp;{{list.releaseDate}}</i>
@@ -35,10 +24,21 @@
                   <i class="el-icon-delete">&nbsp;删除</i>
                 </span>
               </div>
+              <div class="actions" v-else>
+                <span>
+                  <a :href="'/post/' + list.key + '#comment'" target="_blank"><i class="el-icon-s-comment">&nbsp;查看热评</i></a> 
+                </span>
+                <span>
+                  <i class="el-icon-share">&nbsp;分享</i>
+                </span>
+                <span v-if="status == 'collect'" @click="cancelCollect(list.key)">
+                  <i class="el-icon-star-on">&nbsp;取消收藏</i>
+                </span>
+              </div>
             </div>
           </div>
           <div v-else-if="listContentType == 1" class="tagsAndUsers">
-            <router-link :to="'/users/' + list._id" target="_blank" class="avatar-link">
+            <router-link :to="'/users/' + list.account" target="_blank" class="avatar-link">
               <img :src="Avatar(list.avatar)" alt="">
             </router-link>
             <div class="meta">
@@ -50,9 +50,7 @@
             >{{resetFollow[list._id] ? '关注' : '取消关注'}}</el-button>
           </div>
           <div v-else-if="listContentType == 2">
-            <h2>
-              <router-link :to="list.link ? list.link : '#'">{{list.desc}}</router-link>
-            </h2>
+            <router-link :to="list.link ? list.link : '#'" v-html="list.desc" class="activity-desc"></router-link>
           </div>
         </div>
         <div class="nothing" key="nothing" v-if="!count">
@@ -65,7 +63,7 @@
 </template>
 
 <script>
-import { getCenterMessage, deleteCenterMessage, followAuthor} from '@/axios/request';
+import { getCenterMessage, deleteCenterMessage, followAuthor, updateUserCollect} from '@/axios/request';
 
 export default {
   name: 'centerShow',
@@ -89,7 +87,7 @@ export default {
       return Array.isArray(this.showList) ? this.showList.length : Object.keys(this.showList).length;
     },
     listContentType() {
-      if(this.status == 'release' || this.status == 'drafts') {
+      if(this.status == 'release' || this.status == 'drafts' || this.status == 'collect') {
         return 0;
       }else if(this.status == 'follows' || this.status == 'fans') {
         return 1;
@@ -166,6 +164,27 @@ export default {
         console.log('已取消删除');
       })
     },
+    // 取消收藏
+    cancelCollect(key) {
+      let account = this.$store.state.account._id;
+      updateUserCollect({account, key})
+      .then(res => {
+        if(res.data.message == 'success') {
+          this.$message({
+            type: 'success',
+            message: '取消收藏成功'
+          });
+          for(let index in this.showList) {
+            if(this.showList[index].key == key) {
+              console.log('pipei');
+              this.showList.splice(index, 1);
+              break;
+            }
+          }
+          this.$store.commit('cancelCollect', this.showList);
+        }
+      })
+    },
     load() {
       this.status = this.$route.path.split('/')[3] ? this.$route.path.split('/')[3] : '';
       let params = {};
@@ -194,8 +213,14 @@ export default {
         params.type = 'activities';
         params.key = this.$store.state.account.activities;
       }
+      else if(this.status == 'collect') {
+        this.showListTitle = '我的收藏';
+        params.type = 'collect';
+        params.key = this.$store.state.account.activities;
+        params.account = this.$store.state.account._id;
+      }
       else {
-        this.showListTitle = '我的';
+        this.showListTitle = '更多';
       }
       /**
        * 请求用户的所有动态列表
@@ -255,5 +280,13 @@ export default {
     overflow-y: auto;
   }
 }
+
+
 @include animate();
+</style>
+<style>
+.PersonalCenterShow .list .activity-desc i{
+  color: #fAAf00;
+  font-style: normal;
+}
 </style>

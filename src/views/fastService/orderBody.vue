@@ -6,11 +6,13 @@
           <img :src="sponsorAvatar" alt="">
           <span>{{order.Sponsor.name}}</span>
           <span><i class="el-icon-phone"></i>{{ order.Sponsor.phoneNumber }}</span>
+          <button class="chat-btn" @click="goChat">沟通</button>
         </div>
         <div class="customer" v-else-if="isAccepct">
           <img :src="receiverAvatar" alt="">
           <span>{{order.Receiver.name}}</span>
           <span><i class="el-icon-phone"></i>{{ order.Receiver.phoneNumber }}</span>
+          <button class="chat-btn" @click="goChat">沟通</button>
         </div>
         <div class="customer none" v-else>
           <span>待接单...</span>
@@ -216,6 +218,22 @@ section {
             font-size: 17px;
             color: $light-gray;
           }
+        }
+      }
+      .chat-btn {
+        @include button;
+        padding: 5px 6px;
+        border-radius: 5px;
+        width: 56px;
+        height: 29px;
+        font-size: 12px;
+        background-color: rgb(236, 245, 255);
+        color: rgb(64, 158, 255);
+        border: 1px solid rgb(179, 216, 255);
+        &:hover {
+          background-color: rgb(244, 244, 245) ;
+          border: 1px solid rgba(0, 0, 0, .1) ;
+          color: rgb(144, 147, 153);
         }
       }
     }

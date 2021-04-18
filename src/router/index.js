@@ -67,12 +67,6 @@ const routes = [{
                     import ('@/components/content/user/centerShow'),
             },
             {
-                path: 'likes',
-                meta: { title: '个人主页 - 喜欢' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
                 path: 'follows',
                 meta: { title: '个人主页 - 关注列表' },
                 component: () =>
@@ -85,13 +79,7 @@ const routes = [{
                     import ('@/components/content/user/centerShow'),
             },
             {
-                path: 'balance',
-                meta: { title: '个人主页 - 账号交易' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
-                path: 'collection',
+                path: 'collect',
                 meta: { title: '个人主页 - 收藏' },
                 component: () =>
                     import ('@/components/content/user/centerShow'),
@@ -107,43 +95,10 @@ const routes = [{
     },
     // 用户主页路由
     {
-        path: '/user/:id',
+        path: '/users/:id',
         name: 'user',
-        redirect: { name: 'userActivities' },
         component: () =>
-            import ('@/views/personal/user'),
-        children: [{
-                path: 'activities',
-                name: 'userActivities',
-                meta: { title: '个人主页 - 动态' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
-                path: 'release',
-                meta: { title: '个人主页 - 发布内容' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
-                path: 'likes',
-                meta: { title: '个人主页 - 喜欢' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
-                path: 'follows',
-                meta: { title: '个人主页 - 关注列表' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-            {
-                path: 'fans',
-                meta: { title: '个人主页 - 粉丝列表' },
-                component: () =>
-                    import ('@/components/content/user/centerShow'),
-            },
-        ]
+            import ('@/views/personal/user')
     },
     // 私信聊天路由
     {

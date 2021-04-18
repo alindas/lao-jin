@@ -297,14 +297,19 @@ export default {
       .then(() => {
         // 获取对话列表的key 值，如果当前chat 对话框为要删除的列表key 值，
         // 则获取它的上一或下一对话列表key 并赋值给chat 对话框
-        for(let i = 0;i<this.MessageList.length;i++) {
+        const data = this.MessageList;
+        for(let i = 0;i<data.length;i++) {
           if(i == key) {
-            if(this.current == this.MessageList[i]._id) {
-              if(this.MessageList[i+1]) {
-                this.current = this.MessageList[i+1]._id;
+            if(this.current == data[i]._id) {
+              if(data[i+1]) {
+                this.current = data[i+1]._id;
+                this.receiver = data[i+1].sessionA.account == this.loginedAcc ?   
+                  data[i+1].sessionB : data[i+1].sessionA;
               }
-              else if(this.MessageList[i-1]) {
-                this.current = this.MessageList[i-1]._id;
+              else if(data[i-1]) {
+                this.current = data[i-1]._id;
+                this.receiver = data[i-1].sessionA.account == this.loginedAcc ?   
+                  data[i-1].sessionB : data[i-1].sessionA;
               }
               else this.current = '';
             }
@@ -345,7 +350,6 @@ export default {
     },
     // 点击搜索的联系人家在会话
     goChat(contacts) {
-      console.log('here');
       const sponsor = {
         _id: this.$store.state.account._id,
         name: this.$store.state.account.name,
@@ -354,7 +358,10 @@ export default {
       const receiver = contacts;
       createNewChat({ sponsor, receiver })
       .then(res => {
+        console.log(res.data);
+        this.MessageList.push(res.data.chat)
         this.current = res.data.chat._id;
+        this.receiver = contacts;
       })
     },
     handle() {

@@ -59,10 +59,10 @@
                 <i class="el-icon-plus recharge" title="充值" @click="reChargeDialog = true"></i>
                 <span class="right-below-ul-num">{{showInfo.account}}</span>
               </li>
-              <li>
+              <li @click="JumpPage('/collect')">
                 <i class="el-icon-star-on"></i>
                 <span>我的收藏</span>
-                <span class="right-below-ul-num">0</span>
+                <span class="right-below-ul-num">{{$store.state.collectList.length}}</span>
               </li>
             </ul>
           </div>
@@ -125,8 +125,7 @@ export default {
       activeNav: [
         {name: '动态', link: 'activities'},
         {name: '发布', link: 'release'},
-        {name: '草稿 ', link: 'drafts'},
-        {name: '赞 ', link: 'likes'},
+        {name: '草稿 ', link: 'drafts'}
       ],
       // 个人主页展示内容
       showInfo: {},
@@ -139,15 +138,15 @@ export default {
   computed: {
     // 设置默认入口的当前导航栏选中者
     currentPath() {
-      return this.$route.path.split('/')[3] ? this.$route.path.split('/')[3] : 'activities';
+      let routerType = this.$route.path.split('/')[3];
+      return routerType ? routerType : 'activities';
     },
     // 定义导航栏的菜单链接
     pathList() {
       return {
         activities: this.basePath + '/activities',
         release: this.basePath + '/release',
-        drafts: this.basePath + '/drafts',
-        likes: this.basePath + '/likes',
+        drafts: this.basePath + '/drafts'
       }
     },
     userAvatar() {

@@ -45,6 +45,8 @@ let updateUserAccount = data => req.post('updateUserAccount', data);
 
 let getSysMessage = data => req.post('getSysMessage', data);
 
+let updateUserCollect = data => req.post('updateUserCollect', data);
+
 export {
   confirmLoginedMes, // 请求登录用户的基础信息
 
@@ -86,5 +88,5 @@ export {
 
   getSysMessage, // 获取用户系统通知
 
-
+  updateUserCollect, // 取消用户收藏
 }

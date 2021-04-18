@@ -30,6 +30,9 @@ export default new Vuex.Store({
         }
     },
     mutations: {
+        cancelCollect: (state, value) => {
+          state.collectList = value;
+        },
         updateWallet: (state, value) => {
             state.account.account = state.account.account + value.data;
         },

@@ -10,7 +10,7 @@
         <div class="list" v-if="init">
           <div class="author-info-block">
             <router-link :to="'/users/' + mainData.author_link" target="_blank" class="avatar-link">
-              <img :src="Avatar(mainData.author_avatar)" alt="">
+              <img :src="Avatar(authorData[0])" alt="">
             </router-link>
             <div class="author-info-box">
               <router-link :to="'/users/' + mainData.author_link" target="_blank" class="author-name-link">{{mainData.author}}</router-link>
@@ -43,7 +43,7 @@
               <div class="item" v-for="(item,index) in commentData" :key="index">
                 <div class="comment">
                   <div class="userPopover">
-                    <router-link :to="'/personal/' + item.apply.account" target="_blank"><img :src="Avatar(item.apply.avatar)" alt=""></router-link>
+                    <router-link :to="'/users/' + item.apply.account" target="_blank"><img :src="Avatar(item.apply.avatar)" alt=""></router-link>
                   </div>
                   <div class="content-box">
                     <div class="meta-box">
@@ -86,15 +86,15 @@
             <div class="author-title">关于作者</div>
             <div class="author-body">
               <router-link :to="'/users/' + mainData.author_link" target="_blank" class="user-item item">
-                <img :src="Avatar(mainData.author_avatar)" alt="">
+                <img :src="Avatar(authorData[0])" alt="">
                 <span class="uname">{{mainData.author}}</span>
               </router-link>
               <div class="stat-item item">
                 <i class="lj-icon-dianzanqian"></i>
-                <span class="content">获得点赞<span class="count">{{authorData[0]}}</span></span>
+                <span class="content">获得点赞<span class="count">{{authorData[2]}}</span></span>
               </div>
               <div class="stat-item item">
-                <i class="el-icon-view"></i>
+                <i class="el-icon-magic-stick"></i>
                 <span class="content">兼职发布数量<span class="count">{{authorData[1]}}</span></span>
               </div>
             </div>
@@ -315,7 +315,6 @@ export default {
         };
         updateComment(data)
         .then(res => {
-          console.log(res);
           if(res.data.message == 'success') {
             this.commentData[index].like = res.data.newValue;
             this.userLikeCommentList = res.data.newLikeHis;
@@ -480,7 +479,7 @@ export default {
           this.commentData = res.data.comment;
           this.userLikeList = res.data.likeHis;
           this.init = true;
-          showUserArticleMess({release: res.data.mainContent.author_release})
+          showUserArticleMess({account: res.data.mainContent.author_link})
           .then(res => {
             if(res.status == 200) {
               this.authorData = res.data;

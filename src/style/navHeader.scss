@@ -245,7 +245,6 @@ header {
   .list-item {
     display: flex;
     align-items: center;
-    max-height: 50px;
     cursor: pointer;
     position: relative;
     width: 100%;
@@ -254,11 +253,8 @@ header {
       margin: 0 18px;
       box-sizing: border-box;
       padding: 12px 0;
-      white-space: nowrap;
-      text-overflow: ellipsis;
       font-size: 13px;
       border-bottom: 1px solid rgba(18, 18, 18, .1);
-      overflow: hidden;
     }
     i {
       color: #fAAf00;

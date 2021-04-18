@@ -9,7 +9,7 @@
           <div class="message-wrapper" v-for="item of Object.keys(contentBody)" :key="item">
             <p class="message-time" v-if="contentBody[item].timeLine">{{TimeLine(item)}}</p>
             <div class="message-w reserve" v-if="contentBody[item].name == loginedAcc">
-              <div class="avatar"><a href="#"><img :src="avatarSelf" alt=""></a></div>
+              <div class="avatar"><a :href="'/users/' + contentBody[item].name"><img :src="avatarSelf" alt=""></a></div>
               <div class="message-content reserve">
                 <div class="message-pic sender" v-if="contentBody[item].url" @click="enlarge(contentBody[item].url)">
                   <img :src="seePicUrl(contentBody[item].url)" alt="">
@@ -22,7 +22,7 @@
               </div>
             </div>
             <div class="message-w" v-else>
-              <div class="avatar"><a href="#"><img :src="avatarB" alt=""></a></div>
+              <div class="avatar"><a :href="'/users/' + contentBody[item].name"><img :src="avatarB" alt=""></a></div>
               <div class="message-content">
                 <div class="message-pic receiver" v-if="contentBody[item].url" @click="enlarge(contentBody[item].url)">
                   <img :src="seePicUrl(contentBody[item].url)" alt="">
