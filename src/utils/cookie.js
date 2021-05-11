@@ -1,11 +1,11 @@
-const setCookie = (cname, cvalue, exdays, domain, path) => {
+const setCookie = (cname, cvalue, exdays, path) => {
+    let host = window.location.host;
     if (exdays) {
       let d = new Date();
       d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
       let expires = "expires=" + d.toUTCString();
       document.cookie = 
-        `${cname}=${cvalue};${expires};Domain=${domain ? domain : 'localhost'};Path=${path ? path : '/'}`;
-      // document.cookie = cname + "=" + cvalue + "; " + expires;
+        `${cname}=${cvalue};${expires};Domain=${host};Path=${path ? path : '/'}`;
       return;
     }
     document.cookie = cname + "=" + cvalue; // 不设生命时间则在浏览器窗口关闭后消除
@@ -22,8 +22,19 @@ const getCookie = (cname) => {
     return "";
   }
   //清除cookie  
-const clearCookie = (name, domain, path) => {
-  setCookie(name, "", -1, domain, path);
+const clearCookie = (name, path) => {
+  setCookie(name, "", -1, path);
+}
+
+// 清除站点所有cookie
+const delCookie  = () => {
+  let keys = document.cookie.match(/[^ =;]+(?==)/g)
+  if (keys) {
+    for (let i = keys.length; i--;) {
+      document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString() // 清除当前域名下的,例如：m.ratingdog.cn
+      document.cookie = keys[i] + '=0;path=/;domain=' + document.domain + ';expires=' + new Date(0).toUTCString() // 清除当前域名下的，例如 .m.ratingdog.cn
+    }
+  }
 }
 
 const checkCookie = () => {
@@ -45,5 +56,7 @@ export {
 
   clearCookie,
 
-  checkCookie
+  checkCookie,
+
+  delCookie
 }

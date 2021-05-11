@@ -121,7 +121,6 @@ export default {
     load() {
       getCenterMessage({type: 'drafts', key: localStorage.getItem('drafts')})
         .then(res => {
-          console.log(res);
           this.draftsList = res.data;
         })
         .catch(err => {

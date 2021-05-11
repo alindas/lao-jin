@@ -85,7 +85,7 @@
 import { getIndexMain, updatePartTimeWork, followAuthor, followTag, reportMess } from '@/axios/request';
 import showTime from '@/utils/showTime';
 import Clipboard from '@/utils/clipboard';
-import isLogined from '@/utils/loginJudge';
+import getAuthority from '@/utils/getAuthority';
 
 
 
@@ -165,13 +165,14 @@ export default {
     },
 		// 关注用户
     followUser(id, name, avatar) {
+			if(!getAuthority.call(this)) return;
       let params = {
         account: id,
 				name: name,
 				avatar: avatar,
       };
 			let type = this.isfollowUserList[id] ? 'cancel' : '';
-      followAuthor({key: this.$store.state.account.follow, follow: params, type: type})
+      followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type: type})
       .then(res => {
 				console.log(res);
 				if(res.data.message == 'success') {
@@ -186,6 +187,7 @@ export default {
     },
 		// 关注标签
     followTag(tag) {
+			if(!getAuthority.call(this)) return;
       let params = {
         key: this.$store.state.account.followTags,
         user: tag
@@ -243,10 +245,7 @@ export default {
 			})
 		},
 		love(id) {
-			if(!localStorage.getItem('account')) {
-				this.$store.commit('showLoginedDialog');
-				return;
-			}
+			if(!getAuthority.call(this)) return;
 			else {
 				let params = {
           articleKey: this.lists[id]._id,
@@ -277,7 +276,7 @@ export default {
 			}
 		},
 		reportRequest() {
-			if(!isLogined.call(this)) return;
+			if(!getAuthority.call(this)) return;
 			let user = localStorage.getItem('account');
 			for(let item of this.reportedList) {
 				if(item == this.reportMess._id) {

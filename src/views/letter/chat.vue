@@ -1,11 +1,20 @@
 <template>
   <div>
-    <div class="chat-box" v-if="currentMessageKey">
+    <div class="chat-box" v-if="currentMessageKey"
+      v-loading="!init"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(255, 255, 255, 0.667)">
       <div class="chat-box-title">
         <span>{{currentSessionResources.name}}</span>
       </div>
       <div class="messageBox-wrapper">
-        <div class="messageBox">
+        <div class="loadMore" 
+          v-show="loadMore" 
+          v-loading="loadMore"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(255, 255, 255, .8)"
+          ></div>
+        <div class="messageBox" ref="MessContent">
           <div class="message-wrapper" v-for="item of Object.keys(contentBody)" :key="item">
             <p class="message-time" v-if="contentBody[item].timeLine">{{TimeLine(item)}}</p>
             <div class="message-w reserve" v-if="contentBody[item].name == loginedAcc">
@@ -36,6 +45,10 @@
               </div>
             </div>
           </div>
+          <div class="newMessageTip" v-show="havaNewMess" @click="showLatestChat">
+            <i class="el-icon-thumb point_down"></i>
+            新的消息
+          </div>
         </div>
       </div>
       <div class="inputBox">
@@ -52,6 +65,7 @@
         </ul>
         <label for="input-content" class="input">
           <textarea class="input-content" 
+            ref="inputContent"
             @keydown.enter = "handleEnterKey"
             @keydown.tab = "handleTabKey"
             v-model="inputMessage" />
@@ -104,30 +118,45 @@ export default {
     },
     contentBodyLength() {
       return Object.keys(this.contentBody).length; 
-    }
+    },
   },
   data() {
     return {
+      init: false,
       contentBody: {},
       inputMessage: '',
       seeSendPic: false,
       emojiPicker: false,
       picUrl: '',
-      sendContentBody: null
+      sendContentBody: null,
+      havaNewMess: false,
+      showMessCount: 10,
+      loadAllMess: false,
+      loadMore: false,
+      oldMessContentHeight: 0
     }
   },
   watch: {
-    currentMessageKey(newValue) {
-      this.requestData(newValue)
+    currentMessageKey(newVal, oldVal) {
+      if(!oldVal) {
+        this.$nextTick(() => {
+          this.$refs.inputContent.addEventListener('click', () => {
+            this.emojiPicker && (this.emojiPicker = false);
+          })
+        })
+      }
+      this.init = false;
+      this.showMessCount = 10;
+      this.requestData(newVal);
     },
     sendStatus() {
       this.contentBody[this.sendStatus.key] = this.sendStatus.content;
+      this.$nextTick(() => this.showLatestChat());
       this.$forceUpdate();
-      this.showLatestChat();
     },
     '$store.state.notice.chat': function(newVal) {
       this.contentBody[newVal.key] = newVal.content;
-      this.$forceUpdate();
+      this.havaNewMess = true;
     }
   },
   methods: {
@@ -139,11 +168,19 @@ export default {
       this.picUrl = url;
     },
     requestData(key) {
-      getChatMessageContent({key: key})
+      getChatMessageContent({key, count: this.showMessCount})
       .then(res => {
-        this.contentBody = res.data[0];
+        this.init = true;
+        this.loadMore && (this.loadMore = false);
+        this.loadAllMess = res.data.loadAll;
+        this.contentBody = res.data.data;
         this.$nextTick(() => {
-          this.showLatestChat();
+          if(this.showMessCount == 10) {
+            this.showLatestChat();
+          }
+          else {
+            this.showCurrentChat();
+          }
         })
       })
     },
@@ -236,12 +273,22 @@ export default {
         return;
       })
     },
-    // 总是显示chatDialog 对话框的最底部
+    // 显示chatDialog 对话框的最底部
     showLatestChat() {
       let ele = document.querySelector('.messageBox');
       if(ele) {
         this.$nextTick(() => {
           ele.scrollTop = ele.scrollHeight - ele.clientHeight;
+          this.havaNewMess && (this.havaNewMess = false);
+        })
+      }
+    },
+    // 动态加载更多数据
+    showCurrentChat() {
+      let ele = document.querySelector('.messageBox');
+      if(ele) {
+        this.$nextTick(() => {
+          ele.scrollTop = ele.scrollHeight - this.oldMessContentHeight;
         })
       }
     },
@@ -257,6 +304,27 @@ export default {
   },
   created() {
     this.load();
+  },
+  mounted() {
+    if(this.currentMessageKey) {
+      // 监听上拉加载更多
+      this.$refs.MessContent.addEventListener('scroll', e => {
+        if(e.target.scrollTop == 0 && this.contentBodyLength >= 10) {
+          if(!this.loadAllMess) {
+            this.loadMore = true;
+            this.oldMessContentHeight = e.target.scrollHeight;
+            this.showMessCount += 10;
+            this.requestData(this.currentMessageKey);
+          }
+        }
+
+      })
+      // 监听输入框内容
+      this.$refs.inputContent.addEventListener('click', () => {
+        this.emojiPicker && (this.emojiPicker = false);
+      })
+    }
+    
   }
 }
 
@@ -265,4 +333,10 @@ export default {
 @import '@/style/commonValue';
 @import '@/style/chat';
 
+</style>
+<style>
+#InputSearch
+{
+  display: none !important;
+}
 </style>

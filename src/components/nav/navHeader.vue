@@ -60,7 +60,10 @@
             <img src="@/assets/head-pic.png" alt="avatar" class="head-pic" slot="reference" v-else>
           </el-popover>
           <el-popover placement="bottom" width="300">
-            <div class="letter">
+            <div class="letter" 
+              v-loading="seeChatLetterQ"
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(255, 255, 255, 0.667)">
               <div class="letter-top">
                 <span>我的私信</span>
               </div>
@@ -98,7 +101,10 @@
             <i class="el-icon-s-comment" slot="reference" @click="seeChatLetter"><el-badge v-show="letterNum != 0" :value="letterNum" :max="10"/></i>
           </el-popover>
           <el-popover placement="bottom" width="349">
-            <div class="message">
+            <div class="message" 
+              v-loading="seeSysNoticeQ"
+              element-loading-spinner="el-icon-loading"
+              element-loading-background="rgba(255, 255, 255, 0.667)">
               <ul class="message-tab">
                 <li class="message-tab-item" @click="changeMessageType(0)" :style="messageType == 0 ? {color: '#fAAf00'}: {}">
                   <span>
@@ -540,6 +546,7 @@ export default {
       return await confirmLoginedMes({account, token})
       .then(res => {
         if(res.data.message == 'success') {
+          cookieFun.delCookie();
           localStorage.setItem('baseMess', JSON.stringify(res.data.baseMess));
           localStorage.setItem('account', res.data.baseMess._id);
           cookieFun.setCookie('token',token, 30);
@@ -700,7 +707,7 @@ export default {
       loginOut({account: localStorage.getItem('account') })
       .then(res => {
         if(res.data.message == 'success') {
-          cookieFun.clearCookie('token', 'localhost', '/');
+          cookieFun.clearCookie('token');
           localStorage.removeItem('baseMess');
           localStorage.removeItem('account');
           localStorage.removeItem('release');
@@ -849,7 +856,7 @@ export default {
       // 返回搜索框的热点推荐数据
       // this.hotSearch = this.loadAll();
       // 是否已登录？true 则加载个人私人数据
-      this.loginedState = cookieFun.getCookie('token') ? true : false;
+      this.loginedState = localStorage.getItem('account') ? true : false;
       if(this.loginedState) {
         this.loadSearchHist();
       }

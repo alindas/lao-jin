@@ -67,7 +67,7 @@
 import SidebarLayout from '@/components/sidebar/SidebarLayout';
 import AppLinks from '@/components/sidebar/appLinks';
 import {reportMess, getLightDemand, confirmLightDemand} from '@/axios/request';
-import isLogin from '@/utils/loginJudge';
+import isLogin from '@/utils/getAuthority';
 import getFormateDate from '@/utils/dataFormate';
 
 export default {
@@ -183,8 +183,9 @@ export default {
 
 @include rotateAnimation;
 
-@include animate();
+@include animate;
 
+@include heartBiteAnimation;
 
 section {
 	padding-top: 110px;
@@ -285,7 +286,8 @@ section {
         i {
           font-size: 18px;
         }
-        &:hover {
+        &:first-of-type:hover {
+          @include heartBite;
           color: #fff;
           background-color: rgb(230, 162, 60);
         }

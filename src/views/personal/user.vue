@@ -79,13 +79,13 @@
 import {userCenterMess, followAuthor, createNewChat} from '@/axios/request';
 import SidebarLayout from '@/components/sidebar/SidebarLayout';
 import AppLinks from '@/components/sidebar/appLinks';
+import isLogined from '@/utils/getAuthority'
 
 
 export default {
   name: 'user',
   beforeRouteEnter(to, from, next) {
-    console.log(to);
-    document.title = `捞金-${to.params.id}主页`;
+    document.title = `${to.params.id}的个人主页`;
     next();
   },
   data() {
@@ -113,16 +113,11 @@ export default {
     }
   },
   methods: {
-    // 展示块航路由跳转
-    JumpPage(url) {
-      if(url == '/settings/') {
-        this.$router.push(this.basePath + url + 'profile');
-      }
-      else {
-        this.$router.push(this.basePath + url);
-      }
-    },
     load() {
+      if(this.$route.params.id === this.$store.state.account._id) {
+        this.$router.push({name: 'personal', params: {id: this.$route.params.id}});
+        return;
+      }
       userCenterMess({
         account: this.$route.params.id
       })
@@ -134,13 +129,14 @@ export default {
     },
     // 关注用户
     followUser(id, name, avatar) {
+      if(!isLogined.call(this)) return;
       let params = {
         account: id,
 				name: name,
 				avatar: avatar,
       };
 			let type = this.isfollow ? 'cancel' : '';
-      followAuthor({key: this.$store.state.account.follow, follow: params, type: type})
+      followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type: type})
       .then(res => {
 				console.log(res);
 				if(res.data.message == 'success') {
@@ -154,6 +150,7 @@ export default {
     },
     // 前往沟通
     goChat() {
+      if(!isLogined.call(this)) return;
       const sponsor = {
         name: this.showInfoBase.name,
         avatar: this.showInfoBase.avatar,

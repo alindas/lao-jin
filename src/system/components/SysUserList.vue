@@ -1,22 +1,39 @@
 <template>
   <div class="sysuserList">
-    <ListTable :table-title="title" :select-keys="selectKeys" tabTitle="用户列表"
-    :data-table="userList" :actions="actions" :dataTableLength="dataTableLength"
-    @goPage="newUserList" @searchData="setSearch"/>
+     <div class="content-box" ref="contentBox">
+      <ListTableHeander 
+        tabTitle="用户列表"
+        :optionsList="optionsList"
+        @setOptions="setOptions"
+      />
+      <ListTable 
+      :maxHInit="maxHInit"
+      :ListTableMaxH="ListTableMaxH"
+      :table-title="title" 
+      :data-table="userList" 
+      :actions="actions"
+      :dataTableLength="dataTableLength"
+      @goPage="newUserList"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import ListTable from '@/components/common/ShowListData';
+import ListTable from '@/components/common/DataListContent';
+import ListTableHeander from '@/components/common/DataListHeader';
 import { reqLoginedUserSkip } from '@/axios/request';
 
 export default {
   name: 'SysUserList',
   components: {
-    ListTable
+    ListTable,
+    ListTableHeander
   },
   data() {
     return {
+      maxHInit: false,
+      ListTableMaxH: 0,
       title: [{
         prop: '_id',
         label: 'ID'
@@ -33,17 +50,16 @@ export default {
         prop: 'introduction',
         label: '个人简介'
       },],
-      selectKeys: [],
-      searchKey: null,
+      optionsList: [
+        {
+          key: 'users-search',
+          category: 'search',
+          value: undefined,
+          reminder: 'ID/用户名/电话'
+        }
+      ],
       dataTableLength: 0,
       userList: [
-        {
-          _id: '1',
-          name: 'admin',
-          phoneNumber: 10086,
-          profession: '程序猿',
-          introduction: '好人'
-        },
         {
           _id: '1',
           name: 'admin',
@@ -68,7 +84,7 @@ export default {
   },
   methods: {
     load() {
-      reqLoginedUserSkip({skip: 0, pageSize: 10, init: true, key: this.searchKey})
+      reqLoginedUserSkip({skip: 0, pageSize: 10, init: true, key: this.optionsList[0].value})
       .then(res => {
         this.userList = res.data.userList;
         this.dataTableLength = res.data.usrListTotal;
@@ -82,14 +98,28 @@ export default {
         this.userList = res.data.userList;
       })
     },
-    // 设置搜索条件
-    setSearch(val) {
-      this.searchKey = val;
+    setOptions(val) {
+      for(let i of this.optionsList) {
+        if(i.key == val[0]) {
+          i.value = val[1];
+          this.load();
+          break;
+        }
+      }
+    },
+    setSelect(val) {
+      this.selectKey = val;
       this.load();
-    }
+    },
   },
   created() {
     this.load();
+  },
+  mounted() {
+    // 设置数据表格最大高度
+    const contentBox = this.$refs.contentBox;
+    this.ListTableMaxH = contentBox.clientHeight - contentBox.clientTop - 66;
+    this.maxHInit = true;
   }
 }
 
@@ -97,5 +127,12 @@ export default {
 <style>
   .sysuserList {
     height: inherit;
+  }
+
+  .content-box {
+    box-sizing: border-box;
+    width: 100%;
+    height: inherit;
+    padding: 10px 10px 0;
   }
 </style>

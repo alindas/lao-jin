@@ -6,7 +6,7 @@ import { getCookie } from './cookie';
  * @returns 
  * 
  */
-const isLogined = function() {
+const getAuthority = function() {
   if (localStorage.getItem('account') && getCookie('token')) {
     return true; // 已登录返回真
   } else {
@@ -14,4 +14,4 @@ const isLogined = function() {
     return false; // 未登录返回false
   }
 }
-export default isLogined;
+export default getAuthority;

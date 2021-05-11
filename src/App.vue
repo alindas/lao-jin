@@ -54,7 +54,7 @@ export default {
             alert('当前浏览器尚不支持sse 技术，请卸载它并安装Chrome 浏览器（推荐）');
           }else {
             // 开启sse 实时通讯用于接收服务端的动态信息
-            this.sourse = new EventSource(`http://localhost:8888/sse/latestNotify?account=${localStorage.getItem('account')}`);
+            this.sourse = new EventSource(`http://120.79.2.17:9999/sse/latestNotify?account=${localStorage.getItem('account')}`);
             this.sourse.onopen = () => {
               console.log('Connection Success');
             }

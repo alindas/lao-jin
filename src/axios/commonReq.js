@@ -1,8 +1,7 @@
-import Axios from 'axios'
+import Axios from 'axios';
 
 const req = Axios.create({
-  baseURL: 'http://localhost:8848/',
-  timeout: 6000,
+  baseURL: 'http://120.79.2.17:8848/'
 })
 
 let loginByPhone = data => req.post('loginByPhone', data);

@@ -1,6 +1,6 @@
 module.exports = {
   // 打包后静态资源的位置
-  publicPath: process.env.NODE_ENV === 'production' ? '/production-sub-path/' : '/',
+  publicPath: process.env.NODE_ENV !== 'production' ? '/' : '/',
   // 多页配置
   pages: {
     // 项目首页

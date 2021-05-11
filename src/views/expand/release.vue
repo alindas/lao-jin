@@ -113,12 +113,6 @@ import getFormateDate from '@/utils/dataFormate.js';
 
 export default {
   name: 'Release',
-  computed: {
-    draftsPath() {
-      // return '/personal/' + this.$store.state.account._id + '/release';
-      return '/';
-    }
-  },
   data() {
     // 自定义标题验证器
     let SWFilter = (rule, value, callback) => {
@@ -270,7 +264,8 @@ export default {
       }
       updateDrafts(upsetData)
       .then(res => {
-        this.toolTip = '已保存';
+        this.releaseForm.key = res.data.draftsKey;
+        this.$nextTick(() => this.toolTip = '已保存');
       })
       .catch(err => {
         console.log(err);
@@ -303,7 +298,6 @@ export default {
           single: 1,
           singleKey: this.$route.query.id })
         .then(res => {
-          console.log(res);
           let init = res.data[this.$route.query.id];
           for (let i in init.sort) {
             init.sort[i] = init.sort[i].name;
@@ -319,13 +313,9 @@ export default {
       }
       else return;
     },
-    // 对请求过来的数据进行处理
-    transformData(data) {
-      console.log(data);
-    },
     // 返回我的主页并显示发布内容
     myRelease() {
-      window.location.href = '/personal/'+ localStorage.getItem('account') +'/release';
+      window.location.href = `/personal/${localStorage.getItem('account')}/release`;
     }
   },
   created() {

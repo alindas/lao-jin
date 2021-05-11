@@ -3,7 +3,10 @@
     <div class="container">
       <div class="main">
         <div class="userInfo block">
-          <div class="avatar"><img :src="userAvatar" alt="avatar"></div>
+          <div class="avatar">
+            <img :src="userAvatar" alt="avatar" v-if="showInfo.avatar.mimetype">
+            <img src="~@/assets/head-pic.png" alt="avatar" v-else>
+          </div>
           <div class="infoBox">
             <div class="top"><h1>{{showInfo.name}}</h1></div>
             <div class="bottom">
@@ -45,7 +48,7 @@
             <span>关注</span>
             <span>{{followCount}}</span>
           </div>
-          <div @click="JumpPage('/fans')">
+          <div>
             <span>粉丝</span>
             <span>{{fansCount}}</span>
           </div>
@@ -76,7 +79,7 @@
         :show-close="false"
         >
         <h3 slot="title" class="reChargeHeader">
-          <span class="title">余额充值</span>
+          <span class="title">金币充值</span>
           <span>余额: {{showInfo.account}}</span>
         </h3>
         <div class="reCharge-content">
@@ -128,11 +131,24 @@ export default {
         {name: '草稿 ', link: 'drafts'}
       ],
       // 个人主页展示内容
-      showInfo: {},
+      showInfo: {
+        name: '',
+        avatar: {
+          mimetype: '',
+          base64: ''
+        },
+        school: '',
+        introduction: ''
+      },
       selectIndex: 0, // 充值选择项
       reChargeDialog: false, // 充值对话框
       reChargeList: [1,5,10,20,50,200], // 充值选项列表
       reChargeValue: 1
+    }
+  },
+  watch: {
+    '$store.state.account': function(newVal) {
+      this.showInfo = newVal;
     }
   },
   computed: {
@@ -206,7 +222,6 @@ export default {
       if(window.location.href.includes('?')) {
         let url = window.location.href;
         let outTradeNo = url.split('&')[1].split('=')[1];
-        console.log(outTradeNo);
         updateUserAccount({type: 'find', outTradeNo})
         .then(res => {
           this.$store.commit('updateAccount', res.data.account);
@@ -217,8 +232,6 @@ export default {
   created() {
     this.load();
     this.basePath = '/personal/' + this.$route.params.id;
-    console.log(this.$route.params.id);
-    console.log(this.basePath);
   }
 }
 

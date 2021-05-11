@@ -31,9 +31,17 @@
             <div class="comment-form" v-if="logined">
                 <div class="avatar-box" ><img :src="Avatar()" alt=""></div>
                 <div class="form-box">
-                  <el-input size="small" type="textarea" :autosize="true" resize="none" @focus="isfocus = true" @blur="isfocus = false"
-                  @keydown.native.enter = "handleEnterKey" @keydown.native.tab = "handleTabKey" class="applyArticle"
-                  v-model="applyArticleValue" :placeholder="isfocus ? 'Ctrl or ⌘ + Enter  发送' : '发条友善的评论'"></el-input>
+                  <el-input size="small" 
+                    ref="apply_article_box"
+                    type="textarea" 
+                    :autosize="InputRow" 
+                    resize="none" 
+                    @focus="focusArticle(true)" 
+                    @blur="focusArticle(false)"
+                    @keydown.native.enter = "handleEnterKey" 
+                    @keydown.native.tab = "handleTabKey" class="applyArticle"
+                    v-model="applyArticleValue" 
+                    :placeholder="isfocus ? 'Ctrl or ⌘ + Enter  发送' : '发条友善的评论'"></el-input>
                 </div>
             </div>
             <div class="hiddent" v-else>
@@ -59,15 +67,23 @@
                       <div class="datatime">{{applyTime(item.time)}}</div>
                       <div class="action-box">
                         <span class="lj-icon-dianzanqian" :style="isLike(item._id) ? {color: '#fAAf00'} : {}" @click="likeComment(index,item._id)"> {{item.like == 0 ? '' : item.like}}</span>
-                        <span class="el-icon-chat-round" @click="setApplyBox(index)"> 回复</span>
+                        <span class="el-icon-chat-round" @click="setApplyBox(index)"> {{ApplyBox == index ? '取消' : '回复'}}</span>
                       </div>
                     </div>
                     <div class="apply-form" v-if="showApplyBox(index)">
                       <div class="avatar-box" ><img :src="Avatar()" alt=""></div>
                       <div class="form-box">
-                        <el-input size="small" type="textarea" :autosize="true" resize="none" @focus="isfocusCom = true" @blur="isfocusCom = false"
-                        @keydown.native.enter= "handleEnterKey(item.apply.name, item.apply.account)" @keydown.native.tab = "handleTabKey" class="applyComment"
-                        v-model="applyCommentValue" :placeholder="isfocusCom ? 'Ctrl or ⌘ + Enter 发送' : '@'+ item.apply.name + ' :'"></el-input>
+                        <el-input size="small" 
+                          ref="apply_comment_box"
+                          type="textarea" 
+                          :autosize="comInputRow" 
+                          resize="none"
+                          @focus="focusCom(true)" 
+                          @blur="focusCom(false)"
+                          @keydown.native.enter= "handleEnterKey(item.apply.name, item.apply.account)" 
+                          @keydown.native.tab = "handleTabKey" class="applyComment"
+                          v-model="applyCommentValue" 
+                          :placeholder="isfocusCom ? 'Ctrl or ⌘ + Enter 发送' : '@'+ item.apply.name + ' :'"></el-input>
                       </div>
                     </div>
                   </div>
@@ -119,13 +135,67 @@ import {
   showUserArticleMess,
   followAuthor } from '@/axios/request';
 import showTime from '@/utils/showTime';
-import loginJudge from '@/utils/loginJudge';
+import loginJudge from '@/utils/getAuthority';
 import { getCursorPosition, setCursorPosition } from '@/utils/handleCursorPosition';
 import SidebarLayout from '@/components/sidebar/SidebarLayout';
 import AppLinks from '@/components/sidebar/appLinks';
 
 export default {
   name: 'messContent',
+  beforeRouteEnter(to, from, next) {
+    let params = {};
+    params.key = to.params.key;
+    params.logined = localStorage.getItem('account') ? true : false;
+    if(params.logined) {
+      params.account = localStorage.getItem('account');
+    }
+    showPartTimeWork(params)
+    .then(res => {
+      if(res.data.message == 'success') {
+        if(!res.data.mainContent.check) {
+          next(vm => {
+            vm.$message.warning('该兼职信息尚未通过系统审核');
+            vm.$router.push({path: '/'});
+          })
+        }
+        showUserArticleMess({account: res.data.mainContent.author_link})
+        .then(_res => {
+          if(_res.status == 200) {
+            next(vm => {
+              vm.mainData = JSON.parse(JSON.stringify(res.data.mainContent));
+              vm.commentData = res.data.comment;
+              vm.userLikeList = res.data.likeHis;
+              vm.init = true;
+              vm.authorData = _res.data;
+            })
+          }
+          else {
+            next(vm => {
+              vm.mainData = JSON.parse(JSON.stringify(res.data.mainContent));
+              vm.commentData = res.data.comment;
+              vm.userLikeList = res.data.likeHis;
+              vm.init = true;
+              vm.$notify.error('作者数据加载失败');
+            })
+          }
+        })
+      }
+      else {
+        next(vm => {
+          vm.$notify.error({
+            title: '信息加载失败'
+          })
+        })
+      }
+    })
+    .catch(err => {
+      next(vm => {
+        vm.$notify.error({
+          title: '数据加载失败'
+        })
+      })
+    })
+  },
   components: {
     SidebarLayout,
     AppLinks
@@ -169,6 +239,12 @@ export default {
     },
     followText() {
       return this.isFollow ? '已关注' : '关注';
+    },
+    comInputRow() {
+      return this.isfocusCom ? {minRows: 2} : true;
+    },
+    InputRow() {
+      return this.isfocus ? {minRows: 2} : true;
     }
   },
   data() {
@@ -224,10 +300,10 @@ export default {
       params.account = this.mainData.author_link;
       if(!option) {
         params.name = this.mainData.author;
-        params.avatar = this.mainData.author_avatar;
+        params.avatar = this.authorData[0];
         type = '';
       }
-      followAuthor({key: this.$store.state.account.follow, follow: params, type: type})
+      followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type: type})
       .then(res => {
         if(res.data.message == 'success') {
           let options = [this.mainData.author_link, option];
@@ -461,54 +537,20 @@ export default {
         this.$message.error(err)
       })
     },
-    load() {
-      let params = {};
-      params.key = this.$route.params.key;
-      params.logined = this.logined;
-      if(this.logined) {
-        params.account = localStorage.getItem('account');
-      }
-      showPartTimeWork(params)
-      .then(res => {
-        if(res.data.message == 'success') {
-          if(!res.data.mainContent.check) {
-            this.$message.warning('该兼职信息尚未通过系统审核');
-            this.$router.push({path: '/'});
-          }
-          this.mainData = JSON.parse(JSON.stringify(res.data.mainContent));
-          this.commentData = res.data.comment;
-          this.userLikeList = res.data.likeHis;
-          this.init = true;
-          showUserArticleMess({account: res.data.mainContent.author_link})
-          .then(res => {
-            if(res.status == 200) {
-              this.authorData = res.data;
-            }
-            else {
-              this.$notify.error('作者数据加载失败');
-            }
-          })
-        }
-        else {
-          this.$notify.error({
-            title: '信息加载失败'
-          })
-        }
+    // autoSize
+    focusCom(status) {
+      this.isfocusCom = status;
+      this.$nextTick(() => {
+        this.$refs.apply_comment_box[0].resizeTextarea();
       })
-      .catch(err => {
-        this.$notify.error({
-          title: '数据加载失败'
-        })
+    },
+    focusArticle(status) {
+      this.isfocus = status;
+      this.$nextTick(() => {
+        this.$refs.apply_article_box.resizeTextarea();
       })
-
     }
-  },
-  created() {
-    this.load();
-  },
-  mounted() {
-    
-  },
+  }
 }
 
 </script>

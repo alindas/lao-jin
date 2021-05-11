@@ -1,8 +1,7 @@
 import Axios from 'axios'
 
 const req = Axios.create({
-  baseURL: 'http://localhost:8848/users/',
-  timeout: 6000,
+  baseURL: 'http://120.79.2.17:8848/users/'
 })
 
 let confirmLoginedMes = data => req.post('confirmLoginedMes', data);

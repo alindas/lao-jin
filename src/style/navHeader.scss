@@ -121,6 +121,7 @@ header {
   background-color: rgb(255, 255, 255);
   opacity: .6;
   transition: visibility .1s ease;
+  z-index: 999;
   i {
     font-size: 18px;
     margin-right: 5px;
@@ -242,6 +243,7 @@ header {
   overflow-y: hidden;
   border-bottom: 1px solid #ebebeb;
   height: 262px;
+  @include scrollbar;
   .list-item {
     display: flex;
     align-items: center;
@@ -328,6 +330,7 @@ header {
   height: 205px;
   overflow-y: hidden;
   border-bottom: 1px solid #ebebeb;
+  @include scrollbar;
   .list-item {
     display: flex;
     align-items: center;

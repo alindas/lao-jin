@@ -3,7 +3,10 @@
     <div class="header">
       <h4 class="text">
         {{showListTitle}}
-        <span class="count">{{count}}</span>
+        <span class="count">{{Array.isArray(this.showList) ? this.showList.length : Object.keys(this.showList).length}}</span>
+      </h4>
+      <h4 class="updateTip" v-if="collectLoseList.length">
+        共{{collectLoseList.length}}条收藏内容不存在，<span @click="updateUserCollect">点此更新</span>
       </h4>
     </div>
     <div class="list-wrap">
@@ -31,7 +34,7 @@
                 <span>
                   <i class="el-icon-share">&nbsp;分享</i>
                 </span>
-                <span v-if="status == 'collect'" @click="cancelCollect(list.key)">
+                <span v-if="status == 'collect'" @click="cancelCollect(list.key, 'single')">
                   <i class="el-icon-star-on">&nbsp;取消收藏</i>
                 </span>
               </div>
@@ -42,18 +45,18 @@
               <img :src="Avatar(list.avatar)" alt="">
             </router-link>
             <div class="meta">
-              <h4><router-link :to="'/users/' + list._id " target="_blank">{{list.name}}</router-link></h4>
+              <h4><router-link :to="'/users/' + list.account " target="_blank">{{list.name}}</router-link></h4>
               <span>{{list.introduction}}</span>
             </div>
-            <el-button type="primary" size="small" :plain="!resetFollow[list._id]"
-              @click="followUser(list._id, list.name, list.avatar)" v-if="status = 'follows'"
-            >{{resetFollow[list._id] ? '关注' : '取消关注'}}</el-button>
+            <el-button type="primary" size="small" :plain="!resetFollow[list.account]"
+              @click="followUser(list.account, list.name, list.avatar)" v-if="status = 'follows'"
+            >{{resetFollow[list.account] ? '关注' : '取消关注'}}</el-button>
           </div>
           <div v-else-if="listContentType == 2">
             <router-link :to="list.link ? list.link : '#'" v-html="list.desc" class="activity-desc"></router-link>
           </div>
         </div>
-        <div class="nothing" key="nothing" v-if="!count">
+        <div class="nothing" key="nothing" v-if="!(Array.isArray(this.showList) ? this.showList.length : Object.keys(this.showList).length)">
           <span>还没有内容</span>
         </div>
       </transition-group>
@@ -73,8 +76,9 @@ export default {
       releaseList: {}, // 储存展示的发布内容
       diaftsList: {}, // 储存展示的草稿内容
       showList: {}, // 储存展示的内容
+      collectLoseList: 0, // 用户收藏内容
       showListTitle: '', // 展示子标题
-      resetFollow: [] // 取消关注列表
+      resetFollow: {} // 取消关注列表
     }
   },
   watch: {
@@ -83,9 +87,6 @@ export default {
     }
   },
   computed: {
-    count() {
-      return Array.isArray(this.showList) ? this.showList.length : Object.keys(this.showList).length;
-    },
     listContentType() {
       if(this.status == 'release' || this.status == 'drafts' || this.status == 'collect') {
         return 0;
@@ -111,16 +112,19 @@ export default {
     followUser(id, name, avatar) {
       let params = {
         account: id,
-				name: name,
-				avatar: avatar,
+				name,
+				avatar,
       };
 			let type = this.resetFollow[id] ? '' : 'cancel';
-      followAuthor({key: this.$store.state.account.follow, follow: params, type: type})
+      followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type})
       .then(res => {
-				console.log(res);
 				if(res.data.message == 'success') {
+          this.$message({
+            type: 'success',
+            message: `${type ? '取消关注成功' : '关注成功'}`
+          });
 					let option = this.resetFollow[id] ? false : true;
-					this.$store.commit('updateFollowList', [id, !option]);
+					this.$store.commit('updateFollowList', [id, option]);
 					this.$set(this.resetFollow, id, option);
 				}
       })
@@ -142,7 +146,7 @@ export default {
       })
       .then(() => {
         deleteCenterMessage({
-          key: this.$store.state.account.drafts,
+          account: this.$store.state.account.drafts,
           deleteKey: key,
           type: "drafts" })
         .then(res => {
@@ -150,7 +154,9 @@ export default {
             this.$message({
               message: '删除成功',
               type: 'success'
-            })
+            });
+            delete this.showList[key];
+            this.$forceUpdate();
           }
           else {
             this.$message.error('删除失败，请稍后重试');
@@ -165,25 +171,38 @@ export default {
       })
     },
     // 取消收藏
-    cancelCollect(key) {
+    cancelCollect(key, type) {
       let account = this.$store.state.account._id;
-      updateUserCollect({account, key})
+      let storeList = this.showList.map(item => item.key);
+      let message = '取消收藏成功';
+      if(type == 'group') {
+        key = storeList;
+        message = '更新成功';
+      }
+      updateUserCollect({account, key, type})
       .then(res => {
         if(res.data.message == 'success') {
           this.$message({
             type: 'success',
-            message: '取消收藏成功'
+            message
           });
-          for(let index in this.showList) {
-            if(this.showList[index].key == key) {
-              console.log('pipei');
-              this.showList.splice(index, 1);
-              break;
+          if(type == 'single') {
+            for(let index in this.showList) {
+              if(this.showList[index].key == key) {
+                this.showList.splice(index, 1);
+                storeList.splice(index, 1);
+                break;
+              }
             }
           }
-          this.$store.commit('cancelCollect', this.showList);
+          this.$store.commit('cancelCollect', storeList);
+          this.collectLoseList = [];
         }
       })
+    },
+    // 更新丢失的收藏
+    updateUserCollect() {
+      this.cancelCollect(this.showList, 'group');
     },
     load() {
       this.status = this.$route.path.split('/')[3] ? this.$route.path.split('/')[3] : '';
@@ -227,7 +246,14 @@ export default {
        */
       getCenterMessage(params)
       .then(res => {
-        this.showList = res.data;
+        if(this.status == 'collect') {
+          this.showList = res.data.data;
+          let collectList = res.data.list;
+          this.collectLoseList = collectList.filter(item => !(this.showList.some(subitem => subitem.key == item)));
+        }
+        else {
+          this.showList = res.data;
+        }
       })
       .catch(err => {
         console.log(err);
@@ -262,6 +288,19 @@ export default {
     .count {
       margin-left: 5px;
       color: $light-gray;
+    }
+    .updateTip {
+      font-size: 14px;
+      font-weight: normal;
+      color: #666666;
+      span {
+        font-size: 13px;
+        &:hover {
+          cursor: pointer;
+          text-decoration: underline;
+          color: #fAAf00;
+        }
+      }
     }
   }
   .nothing {

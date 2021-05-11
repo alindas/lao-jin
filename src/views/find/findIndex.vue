@@ -24,7 +24,7 @@
               </div>
               <div class="contentList">
                 <div class="contentItem" v-for="(item, index) in tagItem.content" :key="index">
-                  <router-link :to="'user'" class="author">{{item.author}}</router-link>
+                  <router-link :to="'users/' + item.author_link" class="author">{{item.author}}</router-link>
                   <router-link :to="'post/' + item._id" class="contentTitle">{{item.data.title}}</router-link>
                 </div>
               </div>
@@ -62,10 +62,46 @@
 
 <script>
 import { getFindIndex, followTag } from '@/axios/request';
-import loginJudge from '@/utils/loginJudge';
+import loginJudge from '@/utils/getAuthority';
 
 export default {
   name: 'findIndex',
+  beforeRouteEnter(to, from, next) {
+    getFindIndex()
+    .then(res => {
+      if(res.data.message == 'success') {
+        next(vm => {
+          for(let i in res.data.tag) {
+            vm.hotTags[i] = {
+              tag: res.data.tag[i],
+              content: res.data.tagContent[i]
+            }
+            vm.$set(vm.isfollowList, res.data.tag[i].name, false);
+            if(vm.$store.state.followTagsList.length != 0) {
+              for(let j of vm.$store.state.followTagsList) {
+                if(j == res.data.tag[i].name) {
+                  vm.$set(vm.isfollowList, res.data.tag[i].name, true);
+                  break;
+                }
+              }  
+            }
+          }
+          vm.dataInit = true;
+        })
+      }
+      else {
+        next(vm => {
+          vm.$notify.error({
+            title: '错误',
+            message: '数据请求失败'
+          })
+        })
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    }) 
+  },
   data() {
     return {
       hotTags: [], // 热门标签数据
@@ -73,43 +109,7 @@ export default {
       dataInit: false // 数据是否初始成功
     }
   },
-  computed: {
-    
-  },
   methods: {
-    load() {
-      getFindIndex()
-      .then(res => {
-        if(res.data.message == 'success') {
-          for(let i in res.data.tag) {
-            this.hotTags[i] = {
-              tag: res.data.tag[i],
-              content: res.data.tagContent[i]
-            }
-            this.$set(this.isfollowList, res.data.tag[i].name, false);
-            if(this.$store.state.followTagsList.length != 0) {
-              for(let j of this.$store.state.followTagsList) {
-                if(j == res.data.tag[i].name) {
-                  this.$set(this.isfollowList, res.data.tag[i].name, true);
-                  break;
-                }
-              }  
-            }
-            
-          }
-          this.dataInit = true;
-        }
-        else {
-          this.$notify.error({
-            title: '错误',
-            message: '数据请求失败'
-          })
-        }
-      })
-      .catch(err => {
-        console.log(err);
-      }) 
-    },
     // 关注标签
     followTag(name) {
       if(!loginJudge.call(this)) return;
@@ -128,13 +128,8 @@ export default {
     },
     // 改变关注按钮的样式
     change(tag) {
-      console.log(this.isfollowList[tag]);
       this.isfollowList[tag] = !this.isfollowList[tag];
-      console.log(this.isfollowList[tag]);
     },
-  },
-  created() {
-    this.load();
   }
 }
 

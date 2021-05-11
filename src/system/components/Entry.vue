@@ -77,7 +77,7 @@ export default {
           .then(res => {
             loading.close();
             if(res.data.type == 'success') {
-              setCookie('manage', this.username);
+              setCookie('manage', this.username, 1, '/system');
               this.$router.push({name: 'SysHome'})
             }else {
               this.$message.error(res.data.mess)

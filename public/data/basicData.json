@@ -1,0 +1,692 @@
+[
+  {
+    "date": "4-1",
+    "value": 12,
+    "category": "新用户"
+  },
+  {
+    "date": "4-1",
+    "value": 54,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-1",
+    "value": 32,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-2",
+    "value": 45,
+    "category": "新用户"
+  },
+  {
+    "date": "4-2",
+    "value": 13,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-2",
+    "value": 34,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-3",
+    "value": 133,
+    "category": "新用户"
+  },
+  {
+    "date": "4-3",
+    "value": 57,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-3",
+    "value": 30,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-4",
+    "value": 7,
+    "category": "新用户"
+  },
+  {
+    "date": "4-4",
+    "value": 54,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-4",
+    "value": 30,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-5",
+    "value": 54,
+    "category": "新用户"
+  },
+  {
+    "date": "4-5",
+    "value": 69,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-5",
+    "value": 68,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-6",
+    "value": 34,
+    "category": "新用户"
+  },
+  {
+    "date": "4-6",
+    "value": 31,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-6",
+    "value": 13,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-7",
+    "value": 45,
+    "category": "新用户"
+  },
+  {
+    "date": "4-7",
+    "value": 76,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-7",
+    "value": 43,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-8",
+    "value": 13,
+    "category": "新用户"
+  },
+  {
+    "date": "4-8",
+    "value": 77,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-8",
+    "value": 60,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-9",
+    "value": 80,
+    "category": "新用户"
+  },
+  {
+    "date": "4-9",
+    "value": 78,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-9",
+    "value": 34,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-10",
+    "value": 6,
+    "category": "新用户"
+  },
+  {
+    "date": "4-10",
+    "value": 83,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-10",
+    "value": 5,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-11",
+    "value": 46,
+    "category": "新用户"
+  },
+  {
+    "date": "4-11",
+    "value": 91,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-11",
+    "value": 40,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-12",
+    "value": 64,
+    "category": "新用户"
+  },
+  {
+    "date": "4-12",
+    "value": 95,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-12",
+    "value": 66,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-13",
+    "value": 35,
+    "category": "新用户"
+  },
+  {
+    "date": "4-13",
+    "value": 96,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-13",
+    "value": 23,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-14",
+    "value": 11,
+    "category": "新用户"
+  },
+  {
+    "date": "4-14",
+    "value": 103,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-14",
+    "value": 45,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-15",
+    "value": 67,
+    "category": "新用户"
+  },
+  {
+    "date": "4-15",
+    "value": 112,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-15",
+    "value": 23,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-16",
+    "value": 33,
+    "category": "新用户"
+  },
+  {
+    "date": "4-16",
+    "value": 119,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-16",
+    "value": 65,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-17",
+    "value": 34,
+    "category": "新用户"
+  },
+  {
+    "date": "4-17",
+    "value": 122,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-17",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-18",
+    "value": 56,
+    "category": "新用户"
+  },
+  {
+    "date": "4-18",
+    "value": 130,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-18",
+    "value": 13,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-19",
+    "value": 13,
+    "category": "新用户"
+  },
+  {
+    "date": "4-19",
+    "value": 134,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-19",
+    "value": 53,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-20",
+    "value": 0,
+    "category": "新用户"
+  },
+  {
+    "date": "4-20",
+    "value": 12,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-20",
+    "value": 45,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-21",
+    "value": 15,
+    "category": "新用户"
+  },
+  {
+    "date": "4-21",
+    "value": 46,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-21",
+    "value": 70,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-22",
+    "value": 19,
+    "category": "新用户"
+  },
+  {
+    "date": "4-22",
+    "value": 16,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-22",
+    "value": 6,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-23",
+    "value": 7,
+    "category": "新用户"
+  },
+  {
+    "date": "4-23",
+    "value": 13,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-23",
+    "value": 5,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-24",
+    "value": 7,
+    "category": "新用户"
+  },
+  {
+    "date": "4-24",
+    "value": 13,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-24",
+    "value": 5,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-25",
+    "value": 5,
+    "category": "新用户"
+  },
+  {
+    "date": "4-25",
+    "value": 153,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-25",
+    "value": 7,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-26",
+    "value": 23,
+    "category": "新用户"
+  },
+  {
+    "date": "4-26",
+    "value": 17,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-26",
+    "value": 4,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-27",
+    "value": 18,
+    "category": "新用户"
+  },
+  {
+    "date": "4-27",
+    "value": 10,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-27",
+    "value": 30,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-28",
+    "value": 21,
+    "category": "新用户"
+  },
+  {
+    "date": "4-28",
+    "value": 12,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-28",
+    "value": 10,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-29",
+    "value": 12,
+    "category": "新用户"
+  },
+  {
+    "date": "4-29",
+    "value": 14,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-29",
+    "value": 10,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "4-30",
+    "value": 31,
+    "category": "新用户"
+  },
+  {
+    "date": "4-30",
+    "value": 27,
+    "category": "兼职发布"
+  },
+  {
+    "date": "4-30",
+    "value": 30,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-1",
+    "value": 3,
+    "category": "新用户"
+  },
+  {
+    "date": "5-1",
+    "value": 23,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-1",
+    "value": 7,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-2",
+    "value": 4,
+    "category": "新用户"
+  },
+  {
+    "date": "5-2",
+    "value": 39,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-2",
+    "value": 1,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-3",
+    "value": 4,
+    "category": "新用户"
+  },
+  {
+    "date": "5-3",
+    "value": 252,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-3",
+    "value": 0,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-4",
+    "value": 3,
+    "category": "新用户"
+  },
+  {
+    "date": "5-4",
+    "value": 269,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-4",
+    "value": 0,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-5",
+    "value": 4,
+    "category": "新用户"
+  },
+  {
+    "date": "5-5",
+    "value": 271,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-5",
+    "value": 0,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-6",
+    "value": 4,
+    "category": "新用户"
+  },
+  {
+    "date": "5-6",
+    "value": 273,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-6",
+    "value": 1,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-7",
+    "value": 5,
+    "category": "新用户"
+  },
+  {
+    "date": "5-7",
+    "value": 275,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-7",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-8",
+    "value": 5,
+    "category": "新用户"
+  },
+  {
+    "date": "5-8",
+    "value": 287,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-8",
+    "value": 3,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-9",
+    "value": 5,
+    "category": "新用户"
+  },
+  {
+    "date": "5-9",
+    "value": 317,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-9",
+    "value": 5,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-10",
+    "value": 6,
+    "category": "新用户"
+  },
+  {
+    "date": "5-10",
+    "value": 318,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-10",
+    "value": 3,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-11",
+    "value": 8,
+    "category": "新用户"
+  },
+  {
+    "date": "5-11",
+    "value": 345,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-11",
+    "value": 3,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-12",
+    "value": 9,
+    "category": "新用户"
+  },
+  {
+    "date": "5-12",
+    "value": 360,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-12",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-13",
+    "value": 9,
+    "category": "新用户"
+  },
+  {
+    "date": "5-13",
+    "value": 363,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-13",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-14",
+    "value": 10,
+    "category": "新用户"
+  },
+  {
+    "date": "5-14",
+    "value": 358,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-14",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-15",
+    "value": 9,
+    "category": "新用户"
+  },
+  {
+    "date": "5-15",
+    "value": 372,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-15",
+    "value": 2,
+    "category": "轻需求发布"
+  },
+  {
+    "date": "5-16",
+    "value": 11,
+    "category": "新用户"
+  },
+  {
+    "date": "5-16",
+    "value": 393,
+    "category": "兼职发布"
+  },
+  {
+    "date": "5-16",
+    "value": 2,
+    "category": "轻需求发布"
+  }
+]

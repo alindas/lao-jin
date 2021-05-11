@@ -3,7 +3,10 @@
     <div class="container">
       <div class="main">
         <div class="chatWrapper">
-          <div class="chat">
+          <div class="chat"
+            v-loading="!init"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(255, 255, 255, 0.667)">
             <div class="chatSideBar">
               <div class="chatSearch">
                 <el-input
@@ -96,12 +99,11 @@
 </template>
 
 <script>
-import Chat from '@/components/common/chat';
+import Chat from '@/views/letter/chat';
 import { getChatMessage, 
   getIndexMain, 
   sendChatMessage,
   createNewChat } from '@/axios/request';
-import { debounce } from '@/utils/performanceOptimization';
 
 export default {
   name: 'letter',
@@ -151,7 +153,13 @@ export default {
   },
   watch: {
     '$route.params.key': function(newVal, oldVal) {
-      this.current = newVal;
+      for(let item of this.MessageList) {
+        if(item._id === newVal) {
+          this.current = newVal;
+          this.receiver = item.sessionA.account == this.loginedAcc ? item.sessionB : item.sessionA;
+          break;
+        }
+      }
     },
     'chatSearchName': function(newVal, oldVal) {
       this.search(newVal);
@@ -334,7 +342,6 @@ export default {
         clearTimeout(this.searchCD);
       }
       this.searchCD = setTimeout(() => {
-        console.log('sss');
         getIndexMain({
           type: 'search',
           query: this.chatSearchName,
@@ -358,14 +365,14 @@ export default {
       const receiver = contacts;
       createNewChat({ sponsor, receiver })
       .then(res => {
-        console.log(res.data);
         this.MessageList.push(res.data.chat)
         this.current = res.data.chat._id;
-        this.receiver = contacts;
+        this.receiver = {
+          account: contacts._id,
+          avatar: contacts.avatar,
+          name: contacts.name
+        }
       })
-    },
-    handle() {
-      console.log('XXX');
     },
     // 加载组件元数据
     load() {

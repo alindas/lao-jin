@@ -1,34 +1,44 @@
 <template>
   <div class="infoManage">
-    <ListTable 
-    :table-title="title" 
-    :select-keys="selectKeys"
-    tabTitle="信息审核" 
-    :expand="true"
-    :table-title-expand="expandTitle" 
-    :data-table="infoList" 
-    :actions="actions"
-    @pass="pass" 
-    @notPass="notPass" 
-    :dataTableLength="dataTableLength"
-    @goPage="newInfoList"
-    @searchData="setSearch"
-    @selectData="setSelect"/>
+    <div class="content-box" ref="contentBox">
+      <ListTableHeander
+        :optionsList="optionsList"
+        tabTitle="信息审核"
+        @setOptions="setOptions"
+      />
+      <ListTable 
+      :maxHInit="maxHInit"
+      :ListTableMaxH="ListTableMaxH"
+      :table-title="title" 
+      :expand="true"
+      :table-title-expand="expandTitle" 
+      :data-table="infoList" 
+      :actions="actions"
+      @pass="pass" 
+      @notPass="notPass" 
+      :dataTableLength="dataTableLength"
+      @goPage="newInfoList"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import ListTable from '@/components/common/ShowListData';
+import ListTable from '@/components/common/DataListContent';
+import ListTableHeander from '@/components/common/DataListHeader';
 import { reqExamineInfoSkip, ApprovalMessage } from '@/axios/request';
 
 
 export default {
   name: 'InfoManage',
   components: {
-    ListTable
+    ListTable,
+    ListTableHeander
   },
   data() {
     return {
+      maxHInit: false,
+      ListTableMaxH: 0,
       title: [{
         prop: '_id',
         label: 'ID'
@@ -58,18 +68,29 @@ export default {
         prop: 'report',
         label: '举报信息'
       }],
-      selectKeys: [
+      optionsList: [
         {
-          value: 'check',
-          label: '新发布审查'
+          key: 'info-select',
+          category: 'select',
+          value: undefined,
+          reminder: '条件过滤',
+          options: [
+          {
+            value: 'check',
+            label: '新发布审查'
+          },
+          {
+            value: 'report',
+            label: '用户举报审查'
+          }],
         },
         {
-          value: 'report',
-          label: '用户举报审查'
+          key: 'info-search',
+          category: 'search',
+          value: undefined,
+          reminder: 'ID/作者/标题'
         }
       ],
-      searchKey: null,
-      selectKey: null,
       dataTableLength: 0,
       infoList: [
         {
@@ -80,8 +101,7 @@ export default {
           tag: ['作业，嘿'],
           author_link: '369',
           read_count: 233,
-          content: 
-          '同城58同城58同城58同城588同城58同城58同城58同城58同城588同城58同城58同城58同城58同城58同城8同城58同城58同城58同城58同城5858同城58同城58同城58同城58同城588同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城58同城'
+          content: ''
         }
       ],
       actions: [
@@ -100,19 +120,20 @@ export default {
   },
   methods: {
     load() {
-      reqExamineInfoSkip({skip: 0, pageSize: 10, init: true, searchKey: this.searchKey, selectKey: this.selectKey})
+      reqExamineInfoSkip({skip: 0, pageSize: 10, init: true, searchKey: this.optionsList[1].value, selectKey: this.optionsList[0].value})
       .then(res => {
         this.infoList = this.formatInfoList(res.data.infoList);
         this.dataTableLength = res.data.infoListTotal;
       })
     },
-    setSearch(val) {
-      this.searchKey = val;
-      this.load();
-    },
-    setSelect(val) {
-      this.selectKey = val;
-      this.load();
+    setOptions(val) {
+      for(let i of this.optionsList) {
+        if(i.key == val[0]) {
+          i.value = val[1];
+          this.load();
+          break;
+        }
+      }
     },
     newInfoList(currentP) {
       let skip = (currentP-1)*10;
@@ -226,12 +247,24 @@ export default {
   },
   created() {
     this.load();
+  },
+  mounted() {
+    // 设置数据表格最大高度
+    const contentBox = this.$refs.contentBox;
+    this.ListTableMaxH = contentBox.clientHeight - contentBox.clientTop - 66;
+    this.maxHInit = true;
   }
 }
 
 </script>
 <style>
-.infoManage {
-  height: inherit;
-}
+  .infoManage {
+    height: inherit;
+  }
+  .content-box {
+    box-sizing: border-box;
+    width: 100%;
+    height: inherit;
+    padding: 10px 10px 0;
+  }
 </style>

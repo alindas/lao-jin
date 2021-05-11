@@ -24,6 +24,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@antv/g2plot": "^2.3.18",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",

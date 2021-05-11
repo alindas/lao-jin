@@ -96,14 +96,14 @@
                 <div class="input-box">
                   <span class="content-box">{{userInfo.weChat}}</span> 
                 </div>
-                <div class="action-box"><el-button type="text">绑定</el-button></div>
+                <div class="action-box"><el-button type="text" @click="notOpen">绑定</el-button></div>
               </li>
               <li class="item">
                 <span class="title">QQ</span>
                 <div class="input-box">
                   <span class="content-box">{{userInfo.QQ}}</span> 
                 </div>
-                <div class="action-box"><el-button type="text">绑定</el-button></div>
+                <div class="action-box"><el-button type="text" @click="notOpen">绑定</el-button></div>
               </li>
               <li class="item">
                 <span class="title">密码</span>
@@ -113,7 +113,7 @@
               <li class="item">
                 <span class="title">账号注销</span>
                 <div class="input-box" />
-                <div class="action-box"><el-button type="text">注销</el-button></div>
+                <div class="action-box"><el-button type="text" @click="notOpen">注销</el-button></div>
               </li>
             </ul>
           </div>
@@ -258,6 +258,9 @@ export default {
     },
   },
   methods: {
+    notOpen() {
+      this.$message.info('尚未开发');
+    },
     // 头像文件成功上传的回调
     handleAvatarSuccess(res, file) {
       if(res.message == 'success') {
@@ -409,6 +412,7 @@ export default {
             this.$message('请输入验证码');
             break;
           }
+          this.$message.info('正在开发');
           /**
            * 网络请求
            */
@@ -427,10 +431,10 @@ export default {
             this.$message('密码长度不能小于6位');
             break;
           }
+          this.$message.info('正在开发');
           /**
            * 网络请求
            */
-
           break; 
         default: 
           this.$message({message:'系统错误',type:'error'}); return;

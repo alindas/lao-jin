@@ -66,7 +66,7 @@
 <script>
 import { getTagMain, updatePartTimeWork, followTag } from '@/axios/request';
 import showTime from '@/utils/showTime';
-import loginJudge from '@/utils/loginJudge';
+import loginJudge from '@/utils/getAuthority';
 
 
 export default {
@@ -144,10 +144,7 @@ export default {
 			})
 		},
 		love(id) {
-			if(!localStorage.getItem('account')) {
-				this.$store.commit('showLoginedDialog');
-				return;
-			}
+			if(!loginJudge.call(this)) return;
 			else {
 				let params = {
           articleKey: this.lists[id]._id,
