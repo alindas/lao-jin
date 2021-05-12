@@ -113,7 +113,6 @@ export default {
 			})
 			.then(res => {
 				this.report = false;
-				console.log(this.reportID);
 			})
 		},
     confirmOrder(id, sponsor) {

@@ -57,7 +57,7 @@
               </div>
               <div class="stat-item item">
                 <i class="lj-icon-dianzanqian"></i>
-                <span class="content">获得点赞<span class="count">{{showInfoHonor[3]}}</span></span>
+                <span class="content">获得点赞<span class="count">{{showInfoHonor[3].voteup_count}}</span></span>
               </div>
               <div class="stat-item item">
                 <i class="el-icon-magic-stick"></i>
@@ -138,7 +138,6 @@ export default {
 			let type = this.isfollow ? 'cancel' : '';
       followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type: type})
       .then(res => {
-				console.log(res);
 				if(res.data.message == 'success') {
 					let option = this.isfollow ? true : false;
 					this.$store.commit('updateFollowList', [id, option]);
@@ -167,7 +166,6 @@ export default {
         receiver
       })
       .then(res => {
-        console.log(res.data.chat);
         this.$router.push({
           name: 'lettersWKey',
           params: {
@@ -180,8 +178,6 @@ export default {
   created() {
     this.load();
     this.basePath = '/users/' + this.$route.params.id;
-    console.log(this.$route.params.id);
-    console.log(this.basePath);
   }
 }
 

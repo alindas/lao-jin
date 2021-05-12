@@ -611,7 +611,6 @@ export default {
             else {
               this.initLoginUser({'account': res.data.data, 'token': res.data.token})
                 .then(res => {
-                  console.log(res);
                   if(res == 'success') {
                     window.location.reload();
                   }else {
@@ -862,9 +861,6 @@ export default {
       }
       document.addEventListener('scroll',this.pickUpMainNav);
 
-    },
-    showTab() {
-      console.log('嘿嘿');
     }
   },
   created() {

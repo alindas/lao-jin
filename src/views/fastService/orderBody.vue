@@ -160,7 +160,6 @@ export default {
         receiver
       })
       .then(res => {
-        console.log(res.data.chat);
         this.$router.push({
           name: 'lettersWKey',
           params: {

@@ -174,7 +174,6 @@ export default {
 			let type = this.isfollowUserList[id] ? 'cancel' : '';
       followAuthor({myself: this.$store.state.account._id, followKey: this.$store.state.account.follow, follow: params, type: type})
       .then(res => {
-				console.log(res);
 				if(res.data.message == 'success') {
 					let option = this.isfollowUserList[id] ? true : false;
 					this.$store.commit('updateFollowList', [id, option]);
