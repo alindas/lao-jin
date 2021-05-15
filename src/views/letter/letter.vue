@@ -73,7 +73,7 @@
             </div>
             <div class="chatBox">
               <el-upload
-              action="http://localhost:8848/users/chatSendPic"
+              action="http://120.79.2.17:8848/users/chatSendPic"
               name="chatPic"
               class="chatPicInput"
               :data="chatContent"
@@ -227,7 +227,6 @@ export default {
       
     },
     confirmChatPic(file) {
-      // const correctFormat = (file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/jpg');
       const correctFormat = /^image\//.test(file.type);
       const isLt1M = file.size / 1024 / 1024 < 1;
       if (!correctFormat) {
@@ -365,7 +364,9 @@ export default {
       const receiver = contacts;
       createNewChat({ sponsor, receiver })
       .then(res => {
-        this.MessageList.push(res.data.chat)
+        if(!this.MessageList.some(item => item._id === res.data.chat._id)) {
+          this.MessageList.push(res.data.chat);
+        }
         this.current = res.data.chat._id;
         this.receiver = {
           account: contacts._id,

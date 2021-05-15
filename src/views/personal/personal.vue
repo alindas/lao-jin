@@ -190,7 +190,7 @@ export default {
     },
     alipayRecharge() {
       let account = this.showInfo._id;
-      let returnUrl = 'http://localhost:8080/personal/' + this.showInfo._id;
+      let returnUrl = 'http://120.79.2.17/personal/' + this.showInfo._id;
       let outTradeNo = nanoid();
       this.reChargeDialog = false;
       alipayRequest({ value: this.reChargeValue, returnUrl, outTradeNo})

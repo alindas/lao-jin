@@ -66,9 +66,6 @@
               :picker-options="pickerOptions">
             </el-date-picker>
           </el-form-item>
-          <el-form-item label="拒绝人妖">
-            <el-switch v-model="releaseForm.delivery"></el-switch>
-          </el-form-item>
           <el-form-item label="兼职分类" prop="sort">
             <el-checkbox-group v-model="releaseForm.sort">
               <el-checkbox label="校内兼职" name="type"></el-checkbox>

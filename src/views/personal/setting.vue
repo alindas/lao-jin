@@ -19,7 +19,7 @@
                   <img :src="userAvatar" class="avatar">
                   <div class="action-box">
                     <el-upload
-                      action="http://localhost:8848/users/avatar"
+                      action="http://120.79.2.17:8848/users/avatar"
                       name="avatar"
                       :data="accountID"
                       :show-file-list="false"
