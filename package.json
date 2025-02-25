@@ -1,8 +1,8 @@
 {
   "name": "lao-jin",
   "version": "1.0.0",
-  "description": "A graduation project of a college student",
-  "author": "youyu ren",
+  "description": "Blog+external delivery platform",
+  "author": "alindas",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
