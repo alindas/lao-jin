@@ -28,4 +28,5 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Snapshot
+[系统功能演示](https://github.com/alindas/picture-bed/blob/main/laojin/intro.mp4)
 ![snapshot](public/snapshot/home.png)
